@@ -19,7 +19,7 @@ public class ModItems {
     }
 
     //Items
-    public static final Item PRIZE_BOX = register(ModItemIDs.PRIZE_BOX, Item::new, new Item.Properties());
+    public static final Item PRIZE_BOX = register(ModItemIDs.PRIZE_BOX, PrizeBox::new, new Item.Properties());
 
 
     public static void initialize() {
