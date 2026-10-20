@@ -12,6 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PlayerHeadItem;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
@@ -38,7 +40,6 @@ public class PrizeBox extends Item implements PolymerItem {
     }
     @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
-        // return PlayerHeadItem.
         return Items.PLAYER_HEAD;
     }
 }

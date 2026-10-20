@@ -1,3 +1,4 @@
 {
-  "item.template-mod.prize_box": "* Prize Box *"
+  "item.template-mod.prize_box": "* Prize Box *",
+  "itemTooltip.template-mod.prize_box": "Right Click to use!"
 }
