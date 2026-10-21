@@ -31,9 +31,9 @@ public class TemplateMod implements ModInitializer {
 		ModItems.initialize();
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-			dispatcher.register(Commands.literal("test_command").executes(context -> {
+			dispatcher.register(Commands.literal("rewards").executes(context -> {
 				if (!context.getSource().isPlayer()) {
-					context.getSource().sendSuccess(() -> Component.literal("test_command sent outside of a player."),
+					context.getSource().sendSuccess(() -> Component.literal("rewards sent outside of a player."),
 							false);
 					return 1;
 				}
@@ -42,7 +42,7 @@ public class TemplateMod implements ModInitializer {
 
 				g.open();
 
-				context.getSource().sendSuccess(() -> Component.literal("Called /test_command."), false);
+				context.getSource().sendSuccess(() -> Component.literal("Called /rewards."), false);
 				return 1;
 			}));
 		});

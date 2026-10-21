@@ -17,19 +17,16 @@ public class TestGUI extends SimpleGui {
     public TestGUI(ServerPlayer player) {
         super(MenuType.GENERIC_9x3, player, false);
 
-        // this.setTitle();
-        this.setTitle(Component.literal("Reward Options"));
-
-        this.setupBackground();
-        this.setupMenu();
+        this.setTitle(Component.literal("Reward Menu"));
+        this.setupMainMenu();
     }
 
-    private static int[] BORDER = { 0, 8, 9, 17, 18, 26 };
-    private static int[] CUSTOM_SLOTS = { 11, 15 };
-    private static String[] CUSTOM_COMPONENTS = { "Custom Rewards", "Vanilla Rewards" };
-    private static Item[] CUSTOM_MODELS = { Items.SUNFLOWER, Items.GOLDEN_CARROT };
+    private static final int[] BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8 };
+    private static final int[] CUSTOM_SLOTS = { 11, 15 };
+    public static String[] CUSTOM_COMPONENTS = { "Custom Rewards", "Vanilla Rewards" };
+    public static Item[] CUSTOM_MODELS = { Items.SUNFLOWER, Items.GOLDEN_CARROT };
 
-    private void setupMenu() {
+    private void setupMainMenu() {
         for (int s = 0; s < 27; s++){
             this.setSlot(s,
                     new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()));
@@ -42,18 +39,22 @@ public class TestGUI extends SimpleGui {
                     new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()));
     }
 
-    private void setupBackground() {
-
-    }
-
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
         // Make sure the user is not trying to grab the divider
+
         for (int b: CUSTOM_SLOTS)
-            if (index == b)
-                return false;
+            if (index == b){
+                TestVanillaGUI g = new TestVanillaGUI(player);
+                g.open();
+            }
 
         return true;
+    }
+
+    private int selectionSlot(int slot){
+        //First slot + Available Row Slots * Row Number
+        return 10 + (slot % 7) + (slot / 7) * 9;
     }
 
     private Slot[] offerings() {
