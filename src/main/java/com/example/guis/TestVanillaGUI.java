@@ -12,6 +12,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+import java.util.Arrays;
+
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
@@ -31,8 +33,8 @@ public class TestVanillaGUI extends SimpleGui {
     private static final int[] GREY_BORDER = { 1, 2, 3, 4, 5, 6, 7, (9*5)+1, (9*5)+2, (9*5)+3, (9*5)+4, (9*5)+5, (9*5)+6, (9*5)+7};
 
     //Rewards
-    private static final Item[] REWARDS = { Items.PLAYER_HEAD, Items.GOLDEN_APPLE, Items.DIAMOND, Items.STRAW_BED, Items.COOKED_BEEF, Items.FIREWORK_ROCKET, Items.TORCH, Items.ACACIA_LOG, Items.BIRCH_LOG, Items.CHERRY_LOG, Items.JUNGLE_LOG, Items.OAK_LOG, Items.DARK_OAK_LOG, Items.MANGROVE_LOG, Items.PALE_OAK_LOG, Items.POPLAR_LOG, Items.SPRUCE_LOG, Items.CRIMSON_STEM, Items.WARPED_STEM };
-    private static final int[] REWARD_AMOUNT = { 1, 4, 8, 8, 32, 64, 96, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 };
+    private static final Item[] REWARDS = { Items.BUNDLE, Items.GOLDEN_APPLE, Items.DIAMOND, Items.BUCKET, Items.STRAW_BED, Items.COOKED_BEEF, Items.FIREWORK_ROCKET, Items.ABANDONED_CAMP_MAP, Items.BURIED_MINESHAFT_MAP, Items.BURIED_TREASURE_MAP, Items.DESERT_PYRAMID_MAP, Items.JUNGLE_PYRAMID_MAP, Items.OCEAN_MONUMENT_MAP, Items.SWAMP_HUT_MAP, Items.WARM_OCEAN_RUINS_MAP, Items.WOODLAND_MANSION_MAP };
+    private static final int[] REWARD_AMOUNT = { 2, 4, 8, 8, 8, 32, 64, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
     private void setupMainMenu() {
         //Grey Border
@@ -45,7 +47,7 @@ public class TestVanillaGUI extends SimpleGui {
                     new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()));
         //Rewards
         for (int s = 0; s < REWARDS.length; s++) {
-            this.setSlot(rewardSlot(s), new GuiElementBuilder(new ItemStack(REWARDS[s], REWARD_AMOUNT[s])).setName(Component.literal("" + new ItemStack(REWARDS[s], REWARD_AMOUNT[s]))));
+            this.setSlot(rewardSlot(s), new GuiElementBuilder(new ItemStack(REWARDS[s], REWARD_AMOUNT[s])).setName(Component.literal(REWARD_AMOUNT[s] + "x " + REWARDS[s] + "s")));
         }
 
         //Title
