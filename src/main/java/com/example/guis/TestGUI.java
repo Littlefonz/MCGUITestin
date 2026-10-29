@@ -23,20 +23,20 @@ public class TestGUI extends SimpleGui {
 
     private static final int[] BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8 };
     private static final int[] CUSTOM_SLOTS = { 11, 15 };
-    public static String[] CUSTOM_COMPONENTS = { "Custom Rewards", "Vanilla Rewards" };
+    public static String[] CUSTOM_COMPONENTS = { "§9§lCustom Rewards", "§2§lVanilla Rewards" };
     public static Item[] CUSTOM_MODELS = { Items.SUNFLOWER, Items.GOLDEN_CARROT };
 
     private void setupMainMenu() {
         for (int s = 0; s < 27; s++){
             this.setSlot(s,
-                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()));
+                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
         }
         for (int s = 0; s < CUSTOM_SLOTS.length; s++) {
             this.setSlot(CUSTOM_SLOTS[s], new GuiElementBuilder(CUSTOM_MODELS[s]).setName(Component.literal(CUSTOM_COMPONENTS[s])));
         }
         for (int s : BORDER)
             this.setSlot(s,
-                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()));
+                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()).hideTooltip());
     }
 
     @Override

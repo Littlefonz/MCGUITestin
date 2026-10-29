@@ -5,8 +5,6 @@ import static com.example.guis.TestGUI.CUSTOM_MODELS;
 
 import java.util.Map;
 
-import com.example.Items.PrizeBox;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -14,10 +12,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.StructureTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerInput;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -45,47 +41,47 @@ public class TestVanillaGUI extends SimpleGui {
     private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
     private static final int[] GREY_BORDER = { 1, 2, 3, 4, 5, 6, 7, (9*5)+1, (9*5)+2, (9*5)+3, (9*5)+4, (9*5)+5, (9*5)+6, (9*5)+7};
     private static final int TITLE_SLOT = 4;
-    private static final int BACK_BUTTON_SLOT = (9*5+3);
-    private static final int CLOSE_BUTTON_SLOT = (9*5+4);
+    private static final int BACK_BUTTON_SLOT = (9*5)+3;
+    private static final int CLOSE_BUTTON_SLOT = (9*5)+4;
 
     //Rewards
-    private static final Item[] REWARDS = { Items.BUNDLE, Items.GOLDEN_APPLE, Items.DIAMOND, Items.STRAW_BED, Items.COOKED_BEEF, Items.FIREWORK_ROCKET, Items.COAL, Items.ABANDONED_CAMP_MAP, Items.BURIED_MINESHAFT_MAP, Items.BURIED_TREASURE_MAP, Items.DESERT_PYRAMID_MAP, Items.JUNGLE_PYRAMID_MAP, Items.OCEAN_MONUMENT_MAP, Items.SWAMP_HUT_MAP, Items.WARM_OCEAN_RUINS_MAP, Items.WOODLAND_MANSION_MAP };
-    private static final int[] REWARD_AMOUNT = { 2, 4, 8, 8, 32, 64, 64, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    private static final Item[] REWARDS = { Items.TOTEM_OF_UNDYING, Items.GOLDEN_APPLE, Items.DIAMOND, Items.STRAW_BED, Items.COOKED_BEEF, Items.FIREWORK_ROCKET, Items.COAL, Items.ABANDONED_CAMP_MAP, Items.BURIED_MINESHAFT_MAP, Items.BURIED_TREASURE_MAP, Items.DESERT_PYRAMID_MAP, Items.JUNGLE_PYRAMID_MAP, Items.OCEAN_MONUMENT_MAP, Items.SWAMP_HUT_MAP, Items.WARM_OCEAN_RUINS_MAP, Items.WOODLAND_MANSION_MAP };
+    private static final int[] REWARD_AMOUNT = { 1, 4, 8, 8, 32, 64, 64, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
     private record MapType(TagKey<Structure> tag, Holder<MapDecorationType> decoration) {}
 
     private static final Map<Item, MapType> MAP_TYPES = Map.of(
             Items.ABANDONED_CAMP_MAP,   new MapType(StructureTags.ON_ABANDONED_CAMP_SWAMP_MAPS, // TODO make this variable!!!
-                                                    MapDecorationTypes.ABANDONED_CAMP),
+                    MapDecorationTypes.ABANDONED_CAMP),
             Items.BURIED_MINESHAFT_MAP, new MapType(StructureTags.ON_MINESHAFT_MAPS,
-                                                    MapDecorationTypes.MINESHAFT),
+                    MapDecorationTypes.MINESHAFT),
             Items.BURIED_TREASURE_MAP,  new MapType(StructureTags.ON_TREASURE_MAPS,
-                                                    MapDecorationTypes.RED_X),
+                    MapDecorationTypes.RED_X),
             Items.DESERT_PYRAMID_MAP,   new MapType(StructureTags.ON_DESERT_PYRAMID_MAPS,
-                                                    MapDecorationTypes.DESERT_PYRAMID),
+                    MapDecorationTypes.DESERT_PYRAMID),
             Items.JUNGLE_PYRAMID_MAP,   new MapType(StructureTags.ON_JUNGLE_PYRAMID_MAPS,
-                                                    MapDecorationTypes.JUNGLE_TEMPLE),
+                    MapDecorationTypes.JUNGLE_TEMPLE),
             Items.OCEAN_MONUMENT_MAP,   new MapType(StructureTags.ON_OCEAN_MONUMENT_MAPS,
-                                                    MapDecorationTypes.OCEAN_MONUMENT),
+                    MapDecorationTypes.OCEAN_MONUMENT),
             Items.SWAMP_HUT_MAP,        new MapType(StructureTags.ON_SWAMP_HUT_MAPS,
-                                                    MapDecorationTypes.SWAMP_HUT),
+                    MapDecorationTypes.SWAMP_HUT),
             Items.WOODLAND_MANSION_MAP, new MapType(StructureTags.ON_WOODLAND_MANSION_MAPS,
-                                                    MapDecorationTypes.WOODLAND_MANSION));
-
-    int count = 0;
+                    MapDecorationTypes.WOODLAND_MANSION));
 
     private void setupMainMenu() {
-        //Grey Border
+        //Gray Border
         for (int s : GREY_BORDER)
             this.setSlot(s,
-                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()));
+                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
         //Red Border
         for (int s : RED_BORDER)
             this.setSlot(s,
-                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()));
+                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()).hideTooltip());
         //Rewards
         for (int s = 0; s < REWARDS.length; s++) {
-            Component name = Component.literal(REWARD_AMOUNT[s] + "x " + REWARDS[s].getDefaultInstance().getHoverName().getString() + "s");
+            String suffix = "s";
+            if(REWARD_AMOUNT[s] == 1) suffix = "";
+            Component name = Component.literal("§l" + REWARD_AMOUNT[s] + "x §r" + REWARDS[s].getDefaultInstance().getHoverName().getString() + suffix);
 
             this.setSlot(rewardSlot(s), new GuiElementBuilder(new ItemStack(REWARDS[s], REWARD_AMOUNT[s])).setName(name));
         }
@@ -109,7 +105,7 @@ public class TestVanillaGUI extends SimpleGui {
 
                 ItemStack a = itemFromReward(i);
 
-                if(player.getInventory().contains(token)) {
+                if(player.getInventory().contains(token) && player.getInventory().getFreeSlot() > 0) {
                     player.getInventory().removeItem(player.getInventory().findSlotMatchingItem(token), 1);
                     player.addItem(a);
 
