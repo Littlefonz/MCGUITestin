@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "template-mod:item/prize_box"
+    "model": "minecraft:item/name_tag"
   }
 }

@@ -13,5 +13,7 @@ public class ModItemIDs {
     }
 
     //Items
-    public static final ResourceKey<Item> PRIZE_BOX = create("prize_box");
+    public static final ResourceKey<Item> PRIZE_TICKET = create("prize_ticket");
+    public static final ResourceKey<Item> WHEEL_TOKEN = create("wheel_token");
+    public static final ResourceKey<Item> ARTIFACT_VOUCHER = create("artifact_voucher");
 }

@@ -19,7 +19,9 @@ public class ModItems {
     }
 
     //Items
-    public static final Item PRIZE_BOX = register(ModItemIDs.PRIZE_BOX, PrizeBox::new, new Item.Properties());
+    public static final Item PRIZE_TICKET = register(ModItemIDs.PRIZE_TICKET, PrizeTicket::new, new Item.Properties());
+    public static final Item WHEEL_TOKEN = register(ModItemIDs.WHEEL_TOKEN, WheelToken::new, new Item.Properties());
+    public static final Item ARTIFACT_VOUCHER = register(ModItemIDs.ARTIFACT_VOUCHER, ArtifactVoucher::new, new Item.Properties());
 
 
     public static void initialize() {

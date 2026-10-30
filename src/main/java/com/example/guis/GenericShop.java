@@ -1,9 +1,9 @@
 package com.example.guis;
 
-import static com.example.guis.TestGUI.CUSTOM_COMPONENTS;
-import static com.example.guis.TestGUI.CUSTOM_MODELS;
+import com.example.Items.ModItems;
 
 import java.util.Map;
+import java.util.Objects;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -12,7 +12,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.StructureTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
@@ -28,28 +27,22 @@ import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
-public class TestVanillaGUI extends SimpleGui {
-    // GUI Setup
-    public TestVanillaGUI(ServerPlayer player) {
-        super(MenuType.GENERIC_9x6, player, false);
-
-        this.setTitle(Component.literal("Reward Menu - Vanilla Items"));
-        this.setupMainMenu();
-    }
-
-    //UI stuff
-    private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
-    private static final int[] GREY_BORDER = { 1, 2, 3, 4, 5, 6, 7, (9*5)+1, (9*5)+2, (9*5)+3, (9*5)+4, (9*5)+5, (9*5)+6, (9*5)+7};
-    private static final int TITLE_SLOT = 4;
-    private static final int BACK_BUTTON_SLOT = (9*5)+3;
-    private static final int CLOSE_BUTTON_SLOT = (9*5)+4;
+public class GenericShop extends SimpleGui {
 
     //Rewards
-    private static final Item[] REWARDS = { Items.TOTEM_OF_UNDYING, Items.GOLDEN_APPLE, Items.DIAMOND, Items.STRAW_BED, Items.COOKED_BEEF, Items.FIREWORK_ROCKET, Items.COAL, Items.ABANDONED_CAMP_MAP, Items.BURIED_MINESHAFT_MAP, Items.BURIED_TREASURE_MAP, Items.DESERT_PYRAMID_MAP, Items.JUNGLE_PYRAMID_MAP, Items.OCEAN_MONUMENT_MAP, Items.SWAMP_HUT_MAP, Items.WARM_OCEAN_RUINS_MAP, Items.WOODLAND_MANSION_MAP };
-    private static final int[] REWARD_AMOUNT = { 1, 4, 8, 8, 32, 64, 64, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    Item[] rewards = {};
+    int[] rewardAmounts = {};
+    int[] costs = {};
 
+    //UI Locations
+    private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
+    private static final int[] GREY_BORDER = { 1, 2, 3, 4, 5, 6, 7, (9*5)+1, (9*5)+2, (9*5)+3, (9*5)+4, (9*5)+5, (9*5)+6, (9*5)+7};
+    private static final int BACK_BUTTON_SLOT = (9*5)+3;
+    private static final int CLOSE_BUTTON_SLOT = (9*5)+4;
+    //private static final int TITLE_SLOT = 4;
+
+    //Mapping
     private record MapType(TagKey<Structure> tag, Holder<MapDecorationType> decoration) {}
-
     private static final Map<Item, MapType> MAP_TYPES = Map.of(
             Items.ABANDONED_CAMP_MAP,   new MapType(StructureTags.ON_ABANDONED_CAMP_SWAMP_MAPS, // TODO make this variable!!!
                     MapDecorationTypes.ABANDONED_CAMP),
@@ -66,62 +59,88 @@ public class TestVanillaGUI extends SimpleGui {
             Items.SWAMP_HUT_MAP,        new MapType(StructureTags.ON_SWAMP_HUT_MAPS,
                     MapDecorationTypes.SWAMP_HUT),
             Items.WOODLAND_MANSION_MAP, new MapType(StructureTags.ON_WOODLAND_MANSION_MAPS,
-                    MapDecorationTypes.WOODLAND_MANSION));
+                    MapDecorationTypes.WOODLAND_MANSION),
+            Items.BURIED_TRIAL_CHAMBERS_MAP, new MapType(StructureTags.ON_BURIED_TRIAL_CHAMBERS_MAPS,
+                    MapDecorationTypes.TRIAL_CHAMBERS),
+            Items.BURIED_ANCIENT_CITY_MAP, new MapType(StructureTags.ON_ANCIENT_CITY_MAPS,
+                    MapDecorationTypes.ANCIENT_CITY));
+
+    // GUI Setup
+    public GenericShop(ServerPlayer player, Item[] rewards, int[] rewardAmounts, int[] costs) {
+        super(MenuType.GENERIC_9x6, player, false);
+
+        this.rewards = rewards;
+        this.rewardAmounts = rewardAmounts;
+        this.costs = costs;
+
+        this.setTitle(Component.literal("Reward Menu"));
+        this.setupMainMenu();
+    }
 
     private void setupMainMenu() {
+        //Reward Section
+        for (int s = 0; s < rewards.length; s++) {
+            //Fix suffix for 1x items
+            String suffix = "s";
+            if(rewardAmounts[s] == 1) suffix = "";
+
+            //Display
+            Component name = Component.literal("§l" + rewardAmounts[s] + "x §r" + rewards[s].getDefaultInstance().getHoverName().getString() + suffix);
+            this.setSlot(rewardSlot(s), new GuiElementBuilder(new ItemStack(rewards[s], rewardAmounts[s])).setName(name));
+        }
+
         //Gray Border
         for (int s : GREY_BORDER)
             this.setSlot(s,
                     new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
+
         //Red Border
         for (int s : RED_BORDER)
             this.setSlot(s,
                     new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()).hideTooltip());
-        //Rewards
-        for (int s = 0; s < REWARDS.length; s++) {
-            String suffix = "s";
-            if(REWARD_AMOUNT[s] == 1) suffix = "";
-            Component name = Component.literal("§l" + REWARD_AMOUNT[s] + "x §r" + REWARDS[s].getDefaultInstance().getHoverName().getString() + suffix);
-
-            this.setSlot(rewardSlot(s), new GuiElementBuilder(new ItemStack(REWARDS[s], REWARD_AMOUNT[s])).setName(name));
-        }
 
         //Title
-        this.setSlot(TITLE_SLOT, new GuiElementBuilder(CUSTOM_MODELS[1]).setName(Component.literal(CUSTOM_COMPONENTS[1])));
+        //this.setSlot(TITLE_SLOT, new GuiElementBuilder(CUSTOM_MODELS[1]).setName(Component.literal(CUSTOM_COMPONENTS[1])));
+
         //Back Button
-        this.setSlot(BACK_BUTTON_SLOT, new GuiElementBuilder(Items.PLAYER_HEAD).setName(Component.literal("Back")));
+        this.setSlot(BACK_BUTTON_SLOT, new GuiElementBuilder(Items.ARROW).setName(Component.literal("Back")));
+
         //Close Button
         this.setSlot(CLOSE_BUTTON_SLOT, new GuiElementBuilder(Items.BARRIER).setName(Component.literal("Close")));
     }
 
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
-
-        ItemStack token = new ItemStack(Items.PLAYER_HEAD, 1);
-
-        //Reward Exchange
-        for (int i = 0; i < REWARDS.length; i++){
-            if (index == rewardSlot(i)){
-
-                ItemStack a = itemFromReward(i);
-
-                if(player.getInventory().contains(token) && player.getInventory().getFreeSlot() > 0) {
-                    player.getInventory().removeItem(player.getInventory().findSlotMatchingItem(token), 1);
-                    player.addItem(a);
-
-                    return false;
-                }
-            }
-        }
         //Traversing Back
         if (index == BACK_BUTTON_SLOT) {
-            TestGUI g = new TestGUI(player);
+            RewardsMenu g = new RewardsMenu(player);
             g.open();
             return false;
         }
+
         //Closing Menu
         if (index == CLOSE_BUTTON_SLOT)
             close();
+
+        //REWARD SECTION
+        //Check if the player owns the currency
+        ItemStack token = new ItemStack(ModItems.PRIZE_TICKET, 1);
+        if(!player.getInventory().contains(token)){
+            return true;
+        }
+
+        //Player currency count
+        int tokenCount = Objects.requireNonNull(player.getInventory().getSlot(player.getInventory().findSlotMatchingItem(token))).get().getCount();
+
+        //Reward Exchange
+        for (int i = 0; i < rewards.length; i++){
+            if(index == rewardSlot(i) && player.getInventory().contains(token) && tokenCount >= costs[i] && player.getInventory().getFreeSlot() > 0) {
+                ItemStack reward = processReward(i);
+                player.getInventory().removeItem(player.getInventory().findSlotMatchingItem(token), costs[i]);
+                player.addItem(reward);
+                return false;
+            }
+        }
 
         return true;
     }
@@ -131,31 +150,20 @@ public class TestVanillaGUI extends SimpleGui {
         return 10 + (slot % 7) + (slot / 7) * 9;
     }
 
-//    @Override
-//    public InteractionResult useOn(UseOnContext context) {
-//        if (!context.getLevel().isClientSide()) {
-//            // Play the sound and specify location, category and who made the sound.
-//            // No entity made the sound, so we specify null.
-//            context.getLevel().playSound(null, context.getClickedPos(),
-//                    SoundEvents.COPPER_PLACE, SoundSource.PLAYERS,
-//                    1f, 1f);
-//        }
-//
-//        return super.useOn(context);
-//    }
-
-    private ItemStack itemFromReward(int slot) {
+    private ItemStack processReward(int slot) {
         // Check if the reward is a map and handle it accordingly
-        MapType type = MAP_TYPES.get(REWARDS[slot]);
+        MapType type = MAP_TYPES.get(rewards[slot]);
         if (type != null) {
-            ItemStack map = filledMap(type, REWARDS[slot], REWARD_AMOUNT[slot]);
+            ItemStack map = filledMap(type, rewards[slot], rewardAmounts[slot]);
             return map;
         }
 
-        return new ItemStack(REWARDS[slot], REWARD_AMOUNT[slot]);
+        // Else return the reward
+        return new ItemStack(rewards[slot], rewardAmounts[slot]);
     }
 
     private ItemStack filledMap(MapType type, Item originalItem, int amount) {
+        //Map
         ServerLevel level = player.level();
 
         BlockPos pos = level.findNearestMapStructure(type.tag(), player.blockPosition(), 100, true);

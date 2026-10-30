@@ -1,7 +1,7 @@
 package com.example;
 
 import com.example.Items.ModItems;
-import com.example.guis.TestGUI;
+import com.example.guis.RewardsMenu;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -38,7 +38,7 @@ public class TemplateMod implements ModInitializer {
 					return 1;
 				}
 
-				SimpleGui g = new TestGUI(context.getSource().getPlayer());
+				SimpleGui g = new RewardsMenu(context.getSource().getPlayer());
 
 				g.open();
 
