@@ -4,7 +4,6 @@ import com.example.Items.ModItems;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Objects;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -13,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.StructureTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerInput;
@@ -21,7 +21,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.saveddata.maps.MapDecorationType;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
@@ -140,35 +139,48 @@ public class GenericShop extends SimpleGui {
 
         // Reward selection check
         int slot = -1;
+        // Find & check if the player selected a reward slot
         for (int i = 0; i < rewards.length; i++){
             if (index == rewardSlot(i)) {
                 slot = i;
                 break;
             }
         }
+        if (slot == -1)
+            return false;
 
         // REWARD SECTION
         Inventory inv = player.getInventory();
 
         // Player currency count
         int ticketCount = inv.countItem(ModItems.PRIZE_TICKET);
-        if (ticketCount < 0) // How did we get here...?
+        if (ticketCount <= 0) // How did we get here...?
             return false;
 
         // Check if the player has enough currency for the given reward
         if (slot == -1 || ticketCount < costs[slot])
             return false;
 
-        // Check if the player has enough space
-        if(player.getInventory().getFreeSlot() < 0){
-            return false;
-        }
-
         // Process the transaction
         ItemStack reward = processReward(slot);
-        removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, costs[slot]);
-        player.addItem(reward);
-        return true;
+        // Check if the player has space, or if removing the tickets would give space for the item
+        int stacksize = 64;
+        int unfinishedStackCnt = inv.countItem(reward.getItem()) % stacksize;
+
+        if (
+            inv.getFreeSlot() != -1 // Slots exist
+            || (ticketCount - costs[slot] % stacksize == 0) // Removing the tickets would give space
+            || (unfinishedStackCnt > 0 && ((stacksize - unfinishedStackCnt) >= reward.count())) // There exists a viable stack for this item
+        ) {
+            // Add to inventory
+            removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, costs[slot]);
+            inv.add(reward);
+        } else {
+            // Drop on the ground
+            removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, costs[slot]);
+            player.drop(reward, true, Prediction.SERVER_ONLY);
+        }
+        return false;
     }
 
     private int removeNItemsFromContainer(Container c, Item item, int n) {

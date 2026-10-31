@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
+import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
 public class ArtifactVoucher extends Item implements PolymerItem {
@@ -55,9 +56,14 @@ public class ArtifactVoucher extends Item implements PolymerItem {
 
 
     @Override
-    public void modifyBasePolymerItemStack(ItemStack out, ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
-        stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-        PolymerItem.super.modifyBasePolymerItemStack(out, stack, context, lookup);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context,
+		HolderLookup.Provider lookup) {
+		// Create the base client-sided item stack representation
+        ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, lookup);
+
+        out.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+
+        return out;
     }
 
     @Override

@@ -17,7 +17,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
+import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
 public class PrizeTicket extends Item implements PolymerItem {
@@ -54,9 +54,13 @@ public class PrizeTicket extends Item implements PolymerItem {
     }
 
     @Override
-    public void modifyBasePolymerItemStack(ItemStack out, ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
-        stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-        PolymerItem.super.modifyBasePolymerItemStack(out, stack, context, lookup);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context,
+		HolderLookup.Provider lookup) {
+		// Create the base client-sided item stack representation
+        ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, lookup);
+        out.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+
+        return out;
     }
 
     @Override
