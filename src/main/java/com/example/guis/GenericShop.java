@@ -89,17 +89,15 @@ public class GenericShop extends SimpleGui {
         //Reward Section
         for (int s = 0; s < rewards.length; s++) {
             //Fix suffix for 1x items
-            String suffix1 = "s";
-            if(rewardAmounts[s] == 1) suffix1 = "";
-            String suffix2 = "s";
-            if(costs[s] == 1) suffix2 = "";
+            String suffix = "s";
+            if(costs[s] == 1) suffix = "";
 
             //Display
             ArrayList<Component> lore = new ArrayList<>();
             lore.add(Component.literal(""));
-            lore.add(Component.literal("§7Cost: " + costs[s] + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + suffix2));
+            lore.add(Component.literal("§7Cost: " + costs[s] + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + suffix));
             lore.add(Component.literal("§eClick to Exchange!"));
-            Component name = Component.literal("§l" + rewardAmounts[s] + "x §r" + rewards[s].getDefaultInstance().getHoverName().getString() + suffix1);
+            Component name = Component.literal("§l" + rewardAmounts[s] + "x §r" + rewards[s].getDefaultInstance().getHoverName().getString());
             this.setSlot(rewardSlot(s), new GuiElementBuilder(new ItemStack(rewards[s], rewardAmounts[s])).setName(name).setLore(lore));
         }
 
@@ -161,11 +159,15 @@ public class GenericShop extends SimpleGui {
         if (slot == -1 || ticketCount < costs[slot])
             return false;
 
+        // Check if the player has enough space
+        if(player.getInventory().getFreeSlot() < 0){
+            return false;
+        }
+
         // Process the transaction
         ItemStack reward = processReward(slot);
         removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, costs[slot]);
         player.addItem(reward);
-        close();
         return true;
     }
 

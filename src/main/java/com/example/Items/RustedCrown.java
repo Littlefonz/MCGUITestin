@@ -18,8 +18,8 @@ import java.util.function.Consumer;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
 
-public class Crown extends Item implements PolymerItem{
-    public Crown(Item.Properties properties) {
+public class RustedCrown extends Item implements PolymerItem{
+    public RustedCrown(Item.Properties properties) {
         super(properties);
     }
 
@@ -42,7 +42,7 @@ public class Crown extends Item implements PolymerItem{
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> textConsumer, TooltipFlag type) {
-        textConsumer.accept(Component.translatable("itemTooltip.template-mod.crown").withStyle(ChatFormatting.GOLD));
+        textConsumer.accept(Component.translatable("itemTooltip.template-mod.rusted_crown").withStyle(ChatFormatting.GOLD));
 
         super.appendHoverText(stack, context, displayComponent, textConsumer, type);
     }

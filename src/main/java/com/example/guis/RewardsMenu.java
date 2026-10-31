@@ -1,6 +1,13 @@
 package com.example.guis;
 
 
+import static com.example.guis.GUIPresets.CUSTOM_COST;
+import static com.example.guis.GUIPresets.CUSTOM_REWARDS;
+import static com.example.guis.GUIPresets.CUSTOM_REWARD_AMOUNT;
+import static com.example.guis.GUIPresets.VANILLA_COST;
+import static com.example.guis.GUIPresets.VANILLA_REWARDS;
+import static com.example.guis.GUIPresets.VANILLA_REWARD_AMOUNT;
+
 import com.example.Items.ModItems;
 
 import eu.pb4.sgui.api.ClickType;
@@ -15,6 +22,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
 public class RewardsMenu extends SimpleGui {
+
     public RewardsMenu(ServerPlayer player) {
         super(MenuType.GENERIC_9x3, player, false);
 
@@ -25,16 +33,6 @@ public class RewardsMenu extends SimpleGui {
     private static final int[] BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8 };
     private static final int[] CUSTOM_SLOTS = { 11, 15 };
     private static final int CLOSE_BUTTON_SLOT = (9*2)+4;
-
-    //Custom GUI Components
-    private static final Item[] CUSTOM_REWARDS = { ModItems.WHEEL_TOKEN, ModItems.ARTIFACT_VOUCHER };
-    private static final int[] CUSTOM_REWARD_AMOUNT = { 1, 1 };
-    private static final int[] CUSTOM_COST = { 1, 5 };
-
-    //Vanilla GUI Components
-    private static final Item[] VANILLA_REWARDS = { Items.GOLDEN_APPLE, Items.STRAW_BED, Items.DIAMOND, Items.EXPERIENCE_BOTTLE, Items.COOKED_BEEF, Items.FIREWORK_ROCKET, Items.COAL, Items.ABANDONED_CAMP_MAP, Items.BURIED_MINESHAFT_MAP, Items.BURIED_TREASURE_MAP, Items.DESERT_PYRAMID_MAP, Items.JUNGLE_PYRAMID_MAP, Items.OCEAN_MONUMENT_MAP, Items.SWAMP_HUT_MAP, Items.WOODLAND_MANSION_MAP, Items.BURIED_TRIAL_CHAMBERS_MAP, Items.BURIED_ANCIENT_CITY_MAP };
-    private static final int[] VANILLA_REWARD_AMOUNT = { 4, 8, 12, 16, 32, 64, 64, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    private static final int[] VANILLA_COST = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2 };
 
     public static String[] COMPONENTS = { "§9§lCustom Rewards", "§2§lVanilla Rewards" };
     public static Item[] COMPONENT_MODELS = { Items.SUNFLOWER, Items.GOLDEN_CARROT };

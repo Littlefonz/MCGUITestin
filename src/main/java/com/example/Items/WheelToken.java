@@ -1,9 +1,7 @@
 package com.example.Items;
 
-import com.example.guis.GenericShop;
 import com.example.guis.GenericShowcase;
-import com.example.guis.RewardsMenu;
-import com.example.guis.ShowcaseLayouts;
+import com.example.guis.GUIPresets;
 
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
@@ -20,7 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +36,7 @@ public class WheelToken extends Item implements PolymerItem {
     public InteractionResult use(Level level, Player user, InteractionHand hand) {
         // Open GUI
         if (user instanceof ServerPlayer serverPlayerEntity) {
-            SimpleGui g = new GenericShowcase(serverPlayerEntity, ShowcaseLayouts.WHEEL_ITEMS, ShowcaseLayouts.WHEEL_ITEM_AMOUNTS, ShowcaseLayouts.WHEEL_ITEM_CHANCES);
+            SimpleGui g = new GenericShowcase(serverPlayerEntity, GUIPresets.WHEEL_ITEMS, GUIPresets.WHEEL_ITEM_AMOUNTS, GUIPresets.WHEEL_ITEM_CHANCES);
             g.open();
         }
 

@@ -9,6 +9,6 @@
   "itemTooltip.template-mod.astro_coin": "Rare Coins found from Necromerger",
   "item.template-mod.energy_cube": "Energy Cube",
   "itemTooltip.template-mod.energy_cube": "Rare Currency found from Necromerger",
-  "item.template-mod.crown": "Crown",
-  "itemTooltip.template-mod.crown": "The Regal Artifact leftover from an Apocalypse"
+  "item.template-mod.rusted_crown": "Rusted Crown",
+  "itemTooltip.template-mod.rusted_crown": "The Regal Artifact leftover from an Apocalypse"
 }

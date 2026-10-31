@@ -1,12 +1,10 @@
 package com.example.Items;
 
 import com.example.guis.GenericShowcase;
-import com.example.guis.RewardsMenu;
-import com.example.guis.ShowcaseLayouts;
+import com.example.guis.GUIPresets;
 
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -20,8 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
-import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
 public class ArtifactVoucher extends Item implements PolymerItem {
@@ -41,7 +36,7 @@ public class ArtifactVoucher extends Item implements PolymerItem {
     public InteractionResult use(Level level, Player user, InteractionHand hand) {
         // Open GUI
         if (user instanceof ServerPlayer serverPlayerEntity) {
-            SimpleGui g = new GenericShowcase(serverPlayerEntity, ShowcaseLayouts.VOUCHER_ITEMS, ShowcaseLayouts.VOUCHER_ITEM_AMOUNTS, ShowcaseLayouts.VOUCHER_ITEM_CHANCES);
+            SimpleGui g = new GenericShowcase(serverPlayerEntity, GUIPresets.VOUCHER_ITEMS, GUIPresets.VOUCHER_ITEM_AMOUNTS, GUIPresets.VOUCHER_ITEM_CHANCES);
             g.open();
         }
 

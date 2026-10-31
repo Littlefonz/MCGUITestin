@@ -23,7 +23,7 @@ public class ModItems {
     public static final Item WHEEL_TOKEN = register(ModItemIDs.WHEEL_TOKEN, WheelToken::new, new Item.Properties());
     public static final Item ARTIFACT_VOUCHER = register(ModItemIDs.ARTIFACT_VOUCHER, ArtifactVoucher::new, new Item.Properties());
     public static final Item ENERGY_CUBE = register(ModItemIDs.ENERGY_CUBE, EnergyCube::new, new Item.Properties());
-    public static final Item CROWN = register(ModItemIDs.CROWN, Crown::new, new Item.Properties());
+    public static final Item RUSTED_CROWN = register(ModItemIDs.RUSTED_CROWN, RustedCrown::new, new Item.Properties());
     public static final Item ASTRO_COIN = register(ModItemIDs.ASTRO_COIN, AstroCoin::new, new Item.Properties());
 
 
