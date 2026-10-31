@@ -1,14 +1,17 @@
 {
   "item.gs-server-mod.prize_ticket": "Prize Ticket",
-  "itemTooltip.gs-server-mod.prize_ticket": "Tickets used for fun rewards! (Right Click to use!)",
+  "item.gs-server-mod.prize_ticket.info_1": "Tickets used for fun rewards!",
+  "item.gs-server-mod.prize_ticket.info_2": "(Right Click to use!)",
   "item.gs-server-mod.artifact_voucher": "Artifact Voucher",
-  "itemTooltip.gs-server-mod.artifact_voucher": "Exchange with Bekfastpizza123 for a reward! (Right Click to use!)",
+  "item.gs-server-mod.artifact_voucher.info_1": "Exchange with Bekfastpizza123 for a reward!",
+  "item.gs-server-mod.artifact_voucher.info_2": "(Right Click to use!)",
   "item.gs-server-mod.wheel_token": "Wheel Token",
-  "itemTooltip.gs-server-mod.wheel_token": "Exchange with Bekfastpizza123 to spin the wheel! (Right Click to see odds!)",
+  "item.gs-server-mod.wheel_token.info_1": "Exchange with Bekfastpizza123 to spin the wheel!",
+  "item.gs-server-mod.wheel_token.info_2": "(Right Click to see odds!)",
   "item.gs-server-mod.astro_coin": "§bAstro Coin",
-  "itemTooltip.gs-server-mod.astro_coin": "Rare Coins found from Necromerger",
+  "item.gs-server-mod.astro_coin.info": "Rare Coins found from Necromerger",
   "item.gs-server-mod.energy_cube": "§bEnergy Cube",
-  "itemTooltip.gs-server-mod.energy_cube": "Rare Currency found from Necromerger",
+  "item.gs-server-mod.energy_cube.info": "Rare Currency found from Necromerger",
   "item.gs-server-mod.rusted_crown": "§eRusted Crown",
-  "itemTooltip.gs-server-mod.rusted_crown": "The Regal Artifact leftover from an Apocalypse"
+  "item.gs-server-mod.rusted_crown.info": "The Regal Artifact leftover from an Apocalypse"
 }

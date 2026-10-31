@@ -47,7 +47,7 @@ public class RustedCrown extends Item implements PolymerItem{
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> textConsumer, TooltipFlag type) {
-        textConsumer.accept(Component.translatable("itemTooltip.gs-server-mod.rusted_crown").withStyle(ChatFormatting.GOLD));
+        textConsumer.accept(Component.translatable("item.gs-server-mod.rusted_crown.info").withStyle(ChatFormatting.GOLD));
 
         super.appendHoverText(stack, context, displayComponent, textConsumer, type);
     }

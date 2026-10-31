@@ -47,7 +47,7 @@ public class EnergyCube extends Item implements PolymerItem{
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> textConsumer, TooltipFlag type) {
-        textConsumer.accept(Component.translatable("itemTooltip.gs-server-mod.energy_cube").withStyle(ChatFormatting.DARK_AQUA));
+        textConsumer.accept(Component.translatable("item.gs-server-mod.energy_cube.info").withStyle(ChatFormatting.DARK_AQUA));
 
         super.appendHoverText(stack, context, displayComponent, textConsumer, type);
     }

@@ -69,7 +69,8 @@ public class ArtifactVoucher extends Item implements PolymerItem {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> textConsumer, TooltipFlag type) {
-        textConsumer.accept(Component.translatable("itemTooltip.gs-server-mod.artifact_voucher").withStyle(ChatFormatting.GRAY));
+        textConsumer.accept(Component.translatable("item.gs-server-mod.artifact_voucher.info_1").withStyle(ChatFormatting.GRAY));
+        textConsumer.accept(Component.translatable("item.gs-server-mod.artifact_voucher.info_2").withStyle(ChatFormatting.YELLOW));
 
         super.appendHoverText(stack, context, displayComponent, textConsumer, type);
     }
