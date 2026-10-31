@@ -35,13 +35,15 @@ public class GenericShop extends SimpleGui {
     Item[] rewards;
     int[] rewardAmounts;
     int[] costs;
+    String components;
+    Item title;
 
     //UI Locations
     private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
     private static final int[] GREY_BORDER = { 1, 2, 3, 4, 5, 6, 7, (9*5)+1, (9*5)+2, (9*5)+3, (9*5)+4, (9*5)+5, (9*5)+6, (9*5)+7};
     private static final int BACK_BUTTON_SLOT = (9*5)+3;
     private static final int CLOSE_BUTTON_SLOT = (9*5)+4;
-    //private static final int TITLE_SLOT = 4;
+    private static final int TITLE_SLOT = 4;
 
     //Mapping
     private record MapType(TagKey<Structure> tag, Holder<MapDecorationType> decoration) {}
@@ -68,12 +70,14 @@ public class GenericShop extends SimpleGui {
                     MapDecorationTypes.ANCIENT_CITY));
 
     // GUI Setup
-    public GenericShop(ServerPlayer player, Item[] rewards, int[] rewardAmounts, int[] costs) {
+    public GenericShop(ServerPlayer player, Item[] rewards, int[] rewardAmounts, int[] costs, Item title, String components) {
         super(MenuType.GENERIC_9x6, player, false);
 
         this.rewards = rewards;
         this.rewardAmounts = rewardAmounts;
         this.costs = costs;
+        this.components = components;
+        this.title = title;
 
         this.setTitle(Component.literal("Reward Menu"));
         this.setupMainMenu();
@@ -108,7 +112,7 @@ public class GenericShop extends SimpleGui {
                     new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()).hideTooltip());
 
         //Title
-        //this.setSlot(TITLE_SLOT, new GuiElementBuilder(CUSTOM_MODELS[1]).setName(Component.literal(CUSTOM_COMPONENTS[1])));
+        this.setSlot(TITLE_SLOT, new GuiElementBuilder(title).setName(Component.literal(components)));
 
         //Back Button
         this.setSlot(BACK_BUTTON_SLOT, new GuiElementBuilder(Items.ARROW).setName(Component.literal("Back")));

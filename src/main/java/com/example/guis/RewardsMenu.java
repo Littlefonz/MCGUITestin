@@ -29,11 +29,11 @@ public class RewardsMenu extends SimpleGui {
     //Custom GUI Components
     private static final Item[] CUSTOM_REWARDS = { ModItems.WHEEL_TOKEN, ModItems.ARTIFACT_VOUCHER };
     private static final int[] CUSTOM_REWARD_AMOUNT = { 1, 1 };
-    private static final int[] CUSTOM_COST = { 1, 3 };
+    private static final int[] CUSTOM_COST = { 1, 5 };
 
     //Vanilla GUI Components
-    private static final Item[] VANILLA_REWARDS = { Items.GOLDEN_APPLE, Items.DIAMOND, Items.STRAW_BED, Items.EXPERIENCE_BOTTLE, Items.COOKED_BEEF, Items.FIREWORK_ROCKET, Items.COAL, Items.ABANDONED_CAMP_MAP, Items.BURIED_MINESHAFT_MAP, Items.BURIED_TREASURE_MAP, Items.DESERT_PYRAMID_MAP, Items.JUNGLE_PYRAMID_MAP, Items.OCEAN_MONUMENT_MAP, Items.SWAMP_HUT_MAP, Items.WOODLAND_MANSION_MAP, Items.BURIED_TRIAL_CHAMBERS_MAP, Items.BURIED_ANCIENT_CITY_MAP };
-    private static final int[] VANILLA_REWARD_AMOUNT = { 4, 8, 8, 16, 32, 64, 64, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    private static final Item[] VANILLA_REWARDS = { Items.GOLDEN_APPLE, Items.STRAW_BED, Items.DIAMOND, Items.EXPERIENCE_BOTTLE, Items.COOKED_BEEF, Items.FIREWORK_ROCKET, Items.COAL, Items.ABANDONED_CAMP_MAP, Items.BURIED_MINESHAFT_MAP, Items.BURIED_TREASURE_MAP, Items.DESERT_PYRAMID_MAP, Items.JUNGLE_PYRAMID_MAP, Items.OCEAN_MONUMENT_MAP, Items.SWAMP_HUT_MAP, Items.WOODLAND_MANSION_MAP, Items.BURIED_TRIAL_CHAMBERS_MAP, Items.BURIED_ANCIENT_CITY_MAP };
+    private static final int[] VANILLA_REWARD_AMOUNT = { 4, 8, 12, 16, 32, 64, 64, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     private static final int[] VANILLA_COST = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2 };
 
     public static String[] COMPONENTS = { "§9§lCustom Rewards", "§2§lVanilla Rewards" };
@@ -65,10 +65,10 @@ public class RewardsMenu extends SimpleGui {
         // Make sure the user is not trying to grab the divider
         GenericShop g;
         if (index == CUSTOM_SLOTS[0]){
-            g = new GenericShop(player, CUSTOM_REWARDS, CUSTOM_REWARD_AMOUNT, CUSTOM_COST);
+            g = new GenericShop(player, CUSTOM_REWARDS, CUSTOM_REWARD_AMOUNT, CUSTOM_COST, COMPONENT_MODELS[0], COMPONENTS[0]);
             g.open();
         } else if (index == CUSTOM_SLOTS[1]){
-            g = new GenericShop(player, VANILLA_REWARDS, VANILLA_REWARD_AMOUNT, VANILLA_COST);
+            g = new GenericShop(player, VANILLA_REWARDS, VANILLA_REWARD_AMOUNT, VANILLA_COST, COMPONENT_MODELS[1], COMPONENTS[1]);
             g.open();
         }
 
