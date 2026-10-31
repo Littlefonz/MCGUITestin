@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -39,14 +40,15 @@ public class EnergyCube extends Item implements PolymerItem{
 		HolderLookup.Provider lookup) {
 		// Create the base client-sided item stack representation
         ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, lookup);
-        out.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+        // Add a zero-level enchantment to trigger the visual glint on the client
+        out.enchant(lookup.getOrThrow(Enchantments.MENDING), 1);
 
         return out;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> textConsumer, TooltipFlag type) {
-        textConsumer.accept(Component.translatable("itemTooltip.template-mod.energy_cube").withStyle(ChatFormatting.AQUA));
+        textConsumer.accept(Component.translatable("itemTooltip.template-mod.energy_cube").withStyle(ChatFormatting.DARK_AQUA));
 
         super.appendHoverText(stack, context, displayComponent, textConsumer, type);
     }

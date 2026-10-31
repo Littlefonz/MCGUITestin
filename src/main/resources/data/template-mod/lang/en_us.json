@@ -5,10 +5,10 @@
   "itemTooltip.template-mod.artifact_voucher": "Exchange with Bekfastpizza123 for a reward! (Right Click to use!)",
   "item.template-mod.wheel_token": "Wheel Token",
   "itemTooltip.template-mod.wheel_token": "Exchange with Bekfastpizza123 to spin the wheel! (Right Click to see odds!)",
-  "item.template-mod.astro_coin": "Astro Coin",
+  "item.template-mod.astro_coin": "§bAstro Coin",
   "itemTooltip.template-mod.astro_coin": "Rare Coins found from Necromerger",
-  "item.template-mod.energy_cube": "Energy Cube",
+  "item.template-mod.energy_cube": "§bEnergy Cube",
   "itemTooltip.template-mod.energy_cube": "Rare Currency found from Necromerger",
-  "item.template-mod.rusted_crown": "Rusted Crown",
+  "item.template-mod.rusted_crown": "§eRusted Crown",
   "itemTooltip.template-mod.rusted_crown": "The Regal Artifact leftover from an Apocalypse"
 }
