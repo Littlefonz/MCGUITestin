@@ -25,5 +25,5 @@ public class GUIPresets {
     //Vanilla GUI Components
     public static final Item[] VANILLA_REWARDS = {  Items.STRAW_BED, Items.GOLDEN_APPLE, Items.DIAMOND, Items.COAL_BLOCK, Items.EXPERIENCE_BOTTLE, Items.COOKED_BEEF, Items.FIREWORK_ROCKET, Items.OMINOUS_TRIAL_KEY, Items.TRIAL_KEY, Items.ABANDONED_CAMP_MAP, Items.BURIED_MINESHAFT_MAP, Items.BURIED_TREASURE_MAP, Items.DESERT_PYRAMID_MAP, Items.JUNGLE_PYRAMID_MAP, Items.OCEAN_MONUMENT_MAP, Items.SWAMP_HUT_MAP, Items.WOODLAND_MANSION_MAP, Items.BURIED_TRIAL_CHAMBERS_MAP, Items.BURIED_ANCIENT_CITY_MAP, Items.TOTEM_OF_UNDYING };
     public static final int[] VANILLA_REWARD_AMOUNT = { 8, 8, 12, 16, 24, 32, 64, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    public static final int[] VANILLA_COST = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3 };
+    public static final int[] VANILLA_COST = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3 };
 }
