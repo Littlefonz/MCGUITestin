@@ -1,6 +1,6 @@
-package com.example.Items;
+package com.gs.Items;
 
-import com.example.TemplateMod;
+import com.gs.GSServerMod;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -9,7 +9,7 @@ import net.minecraft.world.item.Item;
 public class ModItemIDs {
     public static ResourceKey<Item> create(String name) {
         // Create the item key.
-        return ResourceKey.create(Registries.ITEM, TemplateMod.id(name));
+        return ResourceKey.create(Registries.ITEM, GSServerMod.id(name));
     }
 
     //Items

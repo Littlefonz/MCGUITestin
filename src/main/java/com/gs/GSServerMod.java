@@ -1,7 +1,4 @@
-package com.example;
-
-import com.example.Items.ModItems;
-import com.example.guis.RewardsMenu;
+package com.gs;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -14,8 +11,11 @@ import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TemplateMod implements ModInitializer {
-	public static final String MOD_ID = "template-mod";
+import com.gs.Items.ModItems;
+import com.gs.guis.RewardsMenu;
+
+public class GSServerMod implements ModInitializer {
+	public static final String MOD_ID = "gs-server-mod";
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.

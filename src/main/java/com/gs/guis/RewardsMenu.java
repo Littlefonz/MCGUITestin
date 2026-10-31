@@ -1,14 +1,14 @@
-package com.example.guis;
+package com.gs.guis;
 
 
-import static com.example.guis.GUIPresets.CUSTOM_COST;
-import static com.example.guis.GUIPresets.CUSTOM_REWARDS;
-import static com.example.guis.GUIPresets.CUSTOM_REWARD_AMOUNT;
-import static com.example.guis.GUIPresets.VANILLA_COST;
-import static com.example.guis.GUIPresets.VANILLA_REWARDS;
-import static com.example.guis.GUIPresets.VANILLA_REWARD_AMOUNT;
+import static com.gs.guis.GUIPresets.CUSTOM_COST;
+import static com.gs.guis.GUIPresets.CUSTOM_REWARDS;
+import static com.gs.guis.GUIPresets.CUSTOM_REWARD_AMOUNT;
+import static com.gs.guis.GUIPresets.VANILLA_COST;
+import static com.gs.guis.GUIPresets.VANILLA_REWARDS;
+import static com.gs.guis.GUIPresets.VANILLA_REWARD_AMOUNT;
 
-import com.example.Items.ModItems;
+import com.gs.Items.ModItems;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;

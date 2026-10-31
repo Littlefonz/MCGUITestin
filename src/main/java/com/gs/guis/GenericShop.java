@@ -1,9 +1,9 @@
-package com.example.guis;
-
-import com.example.Items.ModItems;
+package com.gs.guis;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import com.gs.Items.ModItems;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;

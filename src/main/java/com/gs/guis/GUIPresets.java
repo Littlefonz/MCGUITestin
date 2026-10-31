@@ -1,6 +1,6 @@
-package com.example.guis;
+package com.gs.guis;
 
-import com.example.Items.ModItems;
+import com.gs.Items.ModItems;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
