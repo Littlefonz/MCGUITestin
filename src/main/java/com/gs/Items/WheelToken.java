@@ -38,7 +38,7 @@ public class WheelToken extends Item implements PolymerItem {
     public InteractionResult use(Level level, Player user, InteractionHand hand) {
         // Open GUI
         if (user instanceof ServerPlayer serverPlayerEntity) {
-            SimpleGui g = new GenericShowcase(serverPlayerEntity, GUIPresets.WHEEL_ITEMS, GUIPresets.WHEEL_ITEM_AMOUNTS, GUIPresets.WHEEL_ITEM_CHANCES);
+            SimpleGui g = new GenericShowcase(serverPlayerEntity, GUIPresets.WHEEL_REWARDS, GUIPresets.WHEEL_ITEM_CHANCES);
             g.open();
         }
 

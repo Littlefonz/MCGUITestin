@@ -1,14 +1,8 @@
 package com.gs.guis;
 
 
-import static com.gs.guis.GUIPresets.CUSTOM_COST;
 import static com.gs.guis.GUIPresets.CUSTOM_REWARDS;
-import static com.gs.guis.GUIPresets.CUSTOM_REWARD_AMOUNT;
-import static com.gs.guis.GUIPresets.VANILLA_COST;
 import static com.gs.guis.GUIPresets.VANILLA_REWARDS;
-import static com.gs.guis.GUIPresets.VANILLA_REWARD_AMOUNT;
-
-import com.gs.Items.ModItems;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
@@ -63,10 +57,10 @@ public class RewardsMenu extends SimpleGui {
         // Make sure the user is not trying to grab the divider
         GenericShop g;
         if (index == CUSTOM_SLOTS[0]){
-            g = new GenericShop(player, CUSTOM_REWARDS, CUSTOM_REWARD_AMOUNT, CUSTOM_COST, COMPONENT_MODELS[0], COMPONENTS[0]);
+            g = new GenericShop(player, CUSTOM_REWARDS, COMPONENT_MODELS[0], COMPONENTS[0]);
             g.open();
         } else if (index == CUSTOM_SLOTS[1]){
-            g = new GenericShop(player, VANILLA_REWARDS, VANILLA_REWARD_AMOUNT, VANILLA_COST, COMPONENT_MODELS[1], COMPONENTS[1]);
+            g = new GenericShop(player, VANILLA_REWARDS, COMPONENT_MODELS[1], COMPONENTS[1]);
             g.open();
         }
 

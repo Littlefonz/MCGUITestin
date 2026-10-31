@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import com.gs.Items.ModItems;
+import com.gs.guis.GUIPresets.Reward;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -33,9 +34,7 @@ import eu.pb4.sgui.api.gui.SimpleGui;
 public class GenericShop extends SimpleGui {
 
     //Rewards
-    Item[] rewards;
-    int[] rewardAmounts;
-    int[] costs;
+    Reward[] rewards;
     String components;
     Item title;
 
@@ -71,12 +70,10 @@ public class GenericShop extends SimpleGui {
                     MapDecorationTypes.ANCIENT_CITY));
 
     // GUI Setup
-    public GenericShop(ServerPlayer player, Item[] rewards, int[] rewardAmounts, int[] costs, Item title, String components) {
+    public GenericShop(ServerPlayer player, Reward[] rewards, Item title, String components) {
         super(MenuType.GENERIC_9x6, player, false);
 
         this.rewards = rewards;
-        this.rewardAmounts = rewardAmounts;
-        this.costs = costs;
         this.components = components;
         this.title = title;
 
@@ -87,17 +84,18 @@ public class GenericShop extends SimpleGui {
     private void setupMainMenu() {
         //Reward Section
         for (int s = 0; s < rewards.length; s++) {
+            Reward reward = rewards[s];
             //Fix suffix for 1x items
             String suffix = "s";
-            if(costs[s] == 1) suffix = "";
+            if(rewards[s].cost() == 1) suffix = "";
 
             //Display
             ArrayList<Component> lore = new ArrayList<>();
             lore.add(Component.literal(""));
-            lore.add(Component.literal("§7Cost: " + costs[s] + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + suffix));
+            lore.add(Component.literal("§7Cost: " + rewards[s].cost() + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + suffix));
             lore.add(Component.literal("§eClick to Exchange!"));
-            Component name = Component.literal("§l" + rewardAmounts[s] + "x §r" + rewards[s].getDefaultInstance().getHoverName().getString());
-            this.setSlot(rewardSlot(s), new GuiElementBuilder(new ItemStack(rewards[s], rewardAmounts[s])).setName(name).setLore(lore));
+            Component name = Component.literal("§l" + rewards[s].count() + "x §r" + rewards[s].item().getDefaultInstance().getHoverName().getString());
+            this.setSlot(rewardSlot(s), new GuiElementBuilder(reward.stack()).setName(name).setLore(lore));
         }
 
         //Gray Border
@@ -150,6 +148,8 @@ public class GenericShop extends SimpleGui {
             return false;
 
         // REWARD SECTION
+
+        Reward reward = rewards[slot];
         Inventory inv = player.getInventory();
 
         // Player currency count
@@ -158,27 +158,27 @@ public class GenericShop extends SimpleGui {
             return false;
 
         // Check if the player has enough currency for the given reward
-        if (slot == -1 || ticketCount < costs[slot])
+        if (slot == -1 || ticketCount < reward.cost())
             return false;
 
         // Process the transaction
-        ItemStack reward = processReward(slot);
+        ItemStack prize = processReward(reward);
         // Check if the player has space, or if removing the tickets would give space for the item
         int stacksize = 64;
-        int unfinishedStackCnt = inv.countItem(reward.getItem()) % stacksize;
+        int unfinishedStackCnt = inv.countItem(prize.getItem()) % stacksize;
 
         if (
             inv.getFreeSlot() != -1 // Slots exist
-            || (ticketCount - costs[slot] % stacksize == 0) // Removing the tickets would give space
-            || (unfinishedStackCnt > 0 && ((stacksize - unfinishedStackCnt) >= reward.count())) // There exists a viable stack for this item
+            || (ticketCount - reward.cost() % stacksize == 0) // Removing the tickets would give space
+            || (unfinishedStackCnt > 0 && ((stacksize - unfinishedStackCnt) >= prize.count())) // There exists a viable stack for this item
         ) {
             // Add to inventory
-            removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, costs[slot]);
-            inv.add(reward);
+            removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, reward.cost());
+            inv.add(prize);
         } else {
             // Drop on the ground
-            removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, costs[slot]);
-            player.drop(reward, true, Prediction.SERVER_ONLY);
+            removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, reward.cost());
+            player.drop(prize, true, Prediction.SERVER_ONLY);
         }
         return false;
     }
@@ -204,15 +204,15 @@ public class GenericShop extends SimpleGui {
         return 10 + (slot % 7) + (slot / 7) * 9;
     }
 
-    private ItemStack processReward(int slot) {
+    private ItemStack processReward(Reward reward) {
         // Check if the reward is a map and handle it accordingly
-        MapType type = MAP_TYPES.get(rewards[slot]);
+        MapType type = MAP_TYPES.get(reward.item());
         if (type != null) {
-            return filledMap(type, rewards[slot], rewardAmounts[slot]);
+            return filledMap(type, reward.item(), reward.count());
         }
 
         // Else return the reward
-        return new ItemStack(rewards[slot], rewardAmounts[slot]);
+        return reward.stack();
     }
 
     private ItemStack filledMap(MapType type, Item originalItem, int amount) {

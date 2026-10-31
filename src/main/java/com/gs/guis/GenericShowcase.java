@@ -11,6 +11,7 @@ import net.minecraft.world.item.Items;
 import java.util.ArrayList;
 
 import com.gs.Items.ModItems;
+import com.gs.guis.GUIPresets.Reward;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
@@ -19,8 +20,7 @@ import eu.pb4.sgui.api.gui.SimpleGui;
 
 public class GenericShowcase extends SimpleGui {
     //Displays
-    Item[] display;
-    int[] displayAmounts;
+    Reward[] display;
     Component[] components;
 
     //UI Locations
@@ -28,11 +28,10 @@ public class GenericShowcase extends SimpleGui {
     private static final int CLOSE_BUTTON_SLOT = (9*3)+4;
 
     // GUI Setup
-    public GenericShowcase(ServerPlayer player, Item[] display, int[] displayAmounts, Component[] components) {
+    public GenericShowcase(ServerPlayer player, Reward[] display, Component[] components) {
         super(MenuType.GENERIC_9x4, player, false);
 
         this.display = display;
-        this.displayAmounts = displayAmounts;
         this.components = components;
 
         this.setTitle(Component.literal("Showcase"));
@@ -61,8 +60,10 @@ public class GenericShowcase extends SimpleGui {
             ArrayList<Component> lore = new ArrayList<>();
             lore.add(Component.literal(""));
             lore.add(components[s]);
-            Component name = Component.literal("§6" + displayAmounts[s] + "x " + display[s].getDefaultInstance().getHoverName().getString());
-            this.setSlot(displaySlot(s), new GuiElementBuilder(new ItemStack(display[s], displayAmounts[s])).setName(name).setLore(lore));
+
+            ItemStack stack = display[s].stack();
+            Component name = Component.literal("§6" + display[s].count() + "x " + stack.getHoverName().getString());
+            this.setSlot(displaySlot(s), new GuiElementBuilder(stack).setName(name).setLore(lore));
         }
     }
 
