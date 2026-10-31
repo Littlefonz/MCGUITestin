@@ -13,6 +13,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.StructureTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
@@ -123,38 +125,64 @@ public class GenericShop extends SimpleGui {
 
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
-        //Traversing Back
+        // Only accept the Pickup action
+        if (action != ContainerInput.PICKUP)
+            return false;
+
+        // Traversing Back
         if (index == BACK_BUTTON_SLOT) {
             RewardsMenu g = new RewardsMenu(player);
             g.open();
             return false;
         }
 
-        //Closing Menu
+        // Closing Menu
         if (index == CLOSE_BUTTON_SLOT)
             close();
 
-        //REWARD SECTION
-        //Check if the player owns the currency
-        ItemStack token = new ItemStack(ModItems.PRIZE_TICKET, 1);
-        if(!player.getInventory().contains(token)){
-            return true;
-        }
-
-        //Player currency count
-        int tokenCount = Objects.requireNonNull(player.getInventory().getSlot(player.getInventory().findSlotMatchingItem(token))).get().getCount();
-
-        //Reward Exchange
+        // Reward selection check
+        int slot = -1;
         for (int i = 0; i < rewards.length; i++){
-            if(index == rewardSlot(i) && player.getInventory().contains(token) && tokenCount >= costs[i] && player.getInventory().getFreeSlot() > 0) {
-                ItemStack reward = processReward(i);
-                player.getInventory().removeItem(player.getInventory().findSlotMatchingItem(token), costs[i]);
-                player.addItem(reward);
-                return false;
+            if (index == rewardSlot(i)) {
+                slot = i;
+                break;
             }
         }
 
+        // REWARD SECTION
+        Inventory inv = player.getInventory();
+
+        // Player currency count
+        int ticketCount = inv.countItem(ModItems.PRIZE_TICKET);
+        if (ticketCount < 0) // How did we get here...?
+            return false;
+
+        // Check if the player has enough currency for the given reward
+        if (slot == -1 || ticketCount < costs[slot])
+            return false;
+
+        // Process the transaction
+        ItemStack reward = processReward(slot);
+        removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, costs[slot]);
+        player.addItem(reward);
+        close();
         return true;
+    }
+
+    private int removeNItemsFromContainer(Container c, Item item, int n) {
+        int remaining = n;
+        for (int i = 0; remaining > 0 && i < c.getContainerSize(); i++) {
+            ItemStack slot = c.getSlot(i).get();
+            if (slot.isEmpty() || slot.getItem() != item)
+                continue;
+
+            int removedCount = Math.min(slot.count(), remaining);
+            c.removeItem(i, removedCount);
+            remaining = Math.max(remaining - removedCount, 0);
+        }
+
+        // `remaining` SHOULD be 0.
+        return remaining;
     }
 
     private int rewardSlot(int slot){
@@ -174,7 +202,7 @@ public class GenericShop extends SimpleGui {
     }
 
     private ItemStack filledMap(MapType type, Item originalItem, int amount) {
-        //Map
+        // Maps
         ServerLevel level = player.level();
 
         BlockPos pos = level.findNearestMapStructure(type.tag(), player.blockPosition(), 100, true);
