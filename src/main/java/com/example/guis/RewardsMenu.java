@@ -63,14 +63,13 @@ public class RewardsMenu extends SimpleGui {
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
         // Make sure the user is not trying to grab the divider
-
-        for (int b: CUSTOM_SLOTS)
-            if (b == CUSTOM_SLOTS[0]){
-                GenericShop g = new GenericShop(player, VANILLA_REWARDS, VANILLA_REWARD_AMOUNT, VANILLA_COST);
-                g.open();
-            } else {
-                GenericShop g = new GenericShop(player, CUSTOM_REWARDS, CUSTOM_REWARD_AMOUNT, CUSTOM_COST);
-                g.open();
+        GenericShop g;
+        if (index == CUSTOM_SLOTS[0]){
+            g = new GenericShop(player, CUSTOM_REWARDS, CUSTOM_REWARD_AMOUNT, CUSTOM_COST);
+            g.open();
+        } else if (index == CUSTOM_SLOTS[1]){
+            g = new GenericShop(player, VANILLA_REWARDS, VANILLA_REWARD_AMOUNT, VANILLA_COST);
+            g.open();
         }
 
         return true;

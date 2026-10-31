@@ -2,6 +2,7 @@ package com.example.guis;
 
 import com.example.Items.ModItems;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
@@ -18,6 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.saveddata.maps.MapDecorationType;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
@@ -30,9 +32,9 @@ import eu.pb4.sgui.api.gui.SimpleGui;
 public class GenericShop extends SimpleGui {
 
     //Rewards
-    Item[] rewards = {};
-    int[] rewardAmounts = {};
-    int[] costs = {};
+    Item[] rewards;
+    int[] rewardAmounts;
+    int[] costs;
 
     //UI Locations
     private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
@@ -81,12 +83,18 @@ public class GenericShop extends SimpleGui {
         //Reward Section
         for (int s = 0; s < rewards.length; s++) {
             //Fix suffix for 1x items
-            String suffix = "s";
-            if(rewardAmounts[s] == 1) suffix = "";
+            String suffix1 = "s";
+            if(rewardAmounts[s] == 1) suffix1 = "";
+            String suffix2 = "s";
+            if(costs[s] == 1) suffix2 = "";
 
             //Display
-            Component name = Component.literal("§l" + rewardAmounts[s] + "x §r" + rewards[s].getDefaultInstance().getHoverName().getString() + suffix);
-            this.setSlot(rewardSlot(s), new GuiElementBuilder(new ItemStack(rewards[s], rewardAmounts[s])).setName(name));
+            ArrayList<Component> lore = new ArrayList<>();
+            lore.add(Component.literal(""));
+            lore.add(Component.literal("§7Cost: " + costs[s] + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + suffix2));
+            lore.add(Component.literal("§eClick to Exchange!"));
+            Component name = Component.literal("§l" + rewardAmounts[s] + "x §r" + rewards[s].getDefaultInstance().getHoverName().getString() + suffix1);
+            this.setSlot(rewardSlot(s), new GuiElementBuilder(new ItemStack(rewards[s], rewardAmounts[s])).setName(name).setLore(lore));
         }
 
         //Gray Border
@@ -154,8 +162,7 @@ public class GenericShop extends SimpleGui {
         // Check if the reward is a map and handle it accordingly
         MapType type = MAP_TYPES.get(rewards[slot]);
         if (type != null) {
-            ItemStack map = filledMap(type, rewards[slot], rewardAmounts[slot]);
-            return map;
+            return filledMap(type, rewards[slot], rewardAmounts[slot]);
         }
 
         // Else return the reward
