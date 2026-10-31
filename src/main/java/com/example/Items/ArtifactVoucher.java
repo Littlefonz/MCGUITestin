@@ -44,6 +44,8 @@ public class ArtifactVoucher extends Item implements PolymerItem {
         return InteractionResult.SUCCESS;
     }
 
+
+
     @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
         return Items.CUSHION.lightGray();
@@ -60,7 +62,6 @@ public class ArtifactVoucher extends Item implements PolymerItem {
 		HolderLookup.Provider lookup) {
 		// Create the base client-sided item stack representation
         ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, lookup);
-
         out.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 
         return out;

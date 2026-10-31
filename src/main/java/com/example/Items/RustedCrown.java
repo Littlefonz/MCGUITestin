@@ -3,6 +3,7 @@ package com.example.Items;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
@@ -10,7 +11,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
-import net.minecraft.world.item.enchantment.Enchantments;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -40,9 +40,7 @@ public class RustedCrown extends Item implements PolymerItem{
 		HolderLookup.Provider lookup) {
 		// Create the base client-sided item stack representation
         ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, lookup);
-
-        // Add a zero-level enchantment to trigger the visual glint on the client
-        out.enchant(lookup.getOrThrow(Enchantments.MENDING), 1);
+        out.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 
         return out;
     }
