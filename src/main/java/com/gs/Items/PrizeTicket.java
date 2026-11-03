@@ -19,7 +19,7 @@ import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.gs.guis.RewardsMenu;
+import com.gs.guis.RewardOptionsGUI;
 
 import java.util.function.Consumer;
 
@@ -36,7 +36,7 @@ public class PrizeTicket extends Item implements PolymerItem {
     public InteractionResult use(Level level, Player user, InteractionHand hand) {
         // Open GUI
         if (user instanceof ServerPlayer serverPlayerEntity) {
-            SimpleGui g = new RewardsMenu(serverPlayerEntity);
+            SimpleGui g = new RewardOptionsGUI(serverPlayerEntity);
             g.open();
         }
 

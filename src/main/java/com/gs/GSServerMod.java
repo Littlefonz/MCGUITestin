@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gs.Items.ModItems;
-import com.gs.guis.RewardsMenu;
+import com.gs.guis.RewardOptionsGUI;
 
 public class GSServerMod implements ModInitializer {
 	public static final String MOD_ID = "gs-server-mod";
@@ -38,7 +38,7 @@ public class GSServerMod implements ModInitializer {
 					return 1;
 				}
 
-				SimpleGui g = new RewardsMenu(context.getSource().getPlayer());
+				SimpleGui g = new RewardOptionsGUI(context.getSource().getPlayer());
 
 				g.open();
 

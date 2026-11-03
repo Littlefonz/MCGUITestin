@@ -15,9 +15,9 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
-public class RewardsMenu extends SimpleGui {
+public class RewardOptionsGUI extends SimpleGui {
 
-    public RewardsMenu(ServerPlayer player) {
+    public RewardOptionsGUI(ServerPlayer player) {
         super(MenuType.GENERIC_9x3, player, false);
 
         this.setTitle(Component.literal("Reward Menu"));
@@ -55,12 +55,12 @@ public class RewardsMenu extends SimpleGui {
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
         // Make sure the user is not trying to grab the divider
-        GenericShop g;
+        GenericShopGUI g;
         if (index == CUSTOM_SLOTS[0]){
-            g = new GenericShop(player, CUSTOM_REWARDS, COMPONENT_MODELS[0], COMPONENTS[0]);
+            g = new GenericShopGUI(player, CUSTOM_REWARDS, COMPONENT_MODELS[0], COMPONENTS[0]);
             g.open();
         } else if (index == CUSTOM_SLOTS[1]){
-            g = new GenericShop(player, VANILLA_REWARDS, COMPONENT_MODELS[1], COMPONENTS[1]);
+            g = new GenericShopGUI(player, VANILLA_REWARDS, COMPONENT_MODELS[1], COMPONENTS[1]);
             g.open();
         }
 

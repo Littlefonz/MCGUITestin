@@ -20,7 +20,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import com.gs.guis.GUIPresets;
-import com.gs.guis.GenericShowcase;
+import com.gs.guis.GenericShowcaseGUI;
 
 import static com.gs.guis.GUIPresets.VOUCHER_REWARDS;
 
@@ -39,7 +39,7 @@ public class ArtifactVoucher extends Item implements PolymerItem {
     public InteractionResult use(Level level, Player user, InteractionHand hand) {
         // Open GUI
         if (user instanceof ServerPlayer serverPlayerEntity) {
-            SimpleGui g = new GenericShowcase(serverPlayerEntity, VOUCHER_REWARDS, GUIPresets.VOUCHER_ITEM_CHANCES);
+            SimpleGui g = new GenericShowcaseGUI(serverPlayerEntity, VOUCHER_REWARDS, GUIPresets.VOUCHER_ITEM_CHANCES);
             g.open();
         }
 

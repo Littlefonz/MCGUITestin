@@ -21,7 +21,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import com.gs.guis.GUIPresets;
-import com.gs.guis.GenericShowcase;
+import com.gs.guis.GenericShowcaseGUI;
 
 import java.util.function.Consumer;
 
@@ -38,7 +38,7 @@ public class WheelToken extends Item implements PolymerItem {
     public InteractionResult use(Level level, Player user, InteractionHand hand) {
         // Open GUI
         if (user instanceof ServerPlayer serverPlayerEntity) {
-            SimpleGui g = new GenericShowcase(serverPlayerEntity, GUIPresets.WHEEL_REWARDS, GUIPresets.WHEEL_ITEM_CHANCES);
+            SimpleGui g = new GenericShowcaseGUI(serverPlayerEntity, GUIPresets.WHEEL_REWARDS, GUIPresets.WHEEL_ITEM_CHANCES);
             g.open();
         }
 

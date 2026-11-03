@@ -93,9 +93,9 @@ public class GUIPresets {
         Reward.get(1, Items.JUNGLE_PYRAMID_MAP)       .from(1, ModItems.PRIZE_TICKET),
         Reward.get(1, Items.OCEAN_MONUMENT_MAP)       .from(1, ModItems.PRIZE_TICKET),
         Reward.get(1, Items.SWAMP_HUT_MAP)            .from(1, ModItems.PRIZE_TICKET),
-        Reward.get(2, Items.WOODLAND_MANSION_MAP)     .from(1, ModItems.PRIZE_TICKET),
-        Reward.get(3, Items.BURIED_TRIAL_CHAMBERS_MAP).from(1, ModItems.PRIZE_TICKET),
-        Reward.get(3, Items.BURIED_ANCIENT_CITY_MAP)  .from(1, ModItems.PRIZE_TICKET),
-        Reward.get(3, Items.TOTEM_OF_UNDYING)         .from(1, ModItems.PRIZE_TICKET)
+        Reward.get(1, Items.WOODLAND_MANSION_MAP)     .from(2, ModItems.PRIZE_TICKET),
+        Reward.get(1, Items.BURIED_TRIAL_CHAMBERS_MAP).from(3, ModItems.PRIZE_TICKET),
+        Reward.get(1, Items.BURIED_ANCIENT_CITY_MAP)  .from(3, ModItems.PRIZE_TICKET),
+        Reward.get(1, Items.TOTEM_OF_UNDYING)         .from(3, ModItems.PRIZE_TICKET)
     };
 }

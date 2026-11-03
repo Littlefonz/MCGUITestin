@@ -2,6 +2,7 @@ package com.gs.guis;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 import com.gs.Items.ModItems;
 import com.gs.guis.GUIPresets.Reward;
@@ -31,18 +32,22 @@ import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
-public class GenericShop extends SimpleGui {
+public class GenericShopGUI extends SimpleGui {
 
     //Rewards
     Reward[] rewards;
     String components;
     Item title;
 
+    //Confirmation Check
+    boolean confirmation = true;
+
     //UI Locations
     private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
     private static final int[] GREY_BORDER = { 1, 2, 3, 4, 5, 6, 7, (9*5)+1, (9*5)+2, (9*5)+3, (9*5)+4, (9*5)+5, (9*5)+6, (9*5)+7};
     private static final int BACK_BUTTON_SLOT = (9*5)+3;
     private static final int CLOSE_BUTTON_SLOT = (9*5)+4;
+    private static final int CONFIRM_BUTTON_SLOT = (9*5)+5;
     private static final int TITLE_SLOT = 4;
 
     //Mapping
@@ -70,7 +75,7 @@ public class GenericShop extends SimpleGui {
                     MapDecorationTypes.ANCIENT_CITY));
 
     // GUI Setup
-    public GenericShop(ServerPlayer player, Reward[] rewards, Item title, String components) {
+    public GenericShopGUI(ServerPlayer player, Reward[] rewards, Item title, String components) {
         super(MenuType.GENERIC_9x6, player, false);
 
         this.rewards = rewards;
@@ -91,9 +96,10 @@ public class GenericShop extends SimpleGui {
 
             //Display
             ArrayList<Component> lore = new ArrayList<>();
-            lore.add(Component.literal(""));
             lore.add(Component.literal("§7Cost: " + rewards[s].cost() + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + suffix));
-            lore.add(Component.literal("§eClick to Exchange!"));
+            lore.add(Component.literal(""));
+            lore.add(Component.literal("§eLeft Click to Exchange!"));
+            lore.add(Component.literal("§eRight Click to Bulk Exchange!"));
             Component name = Component.literal("§l" + rewards[s].count() + "x §r" + rewards[s].item().getDefaultInstance().getHoverName().getString());
             this.setSlot(rewardSlot(s), new GuiElementBuilder(reward.stack()).setName(name).setLore(lore));
         }
@@ -116,6 +122,18 @@ public class GenericShop extends SimpleGui {
 
         //Close Button
         this.setSlot(CLOSE_BUTTON_SLOT, new GuiElementBuilder(Items.BARRIER).setName(Component.literal("Close")));
+
+        //Confirmation Button
+        ArrayList<Component> lore = new ArrayList<>();
+        lore.add(Component.literal(""));
+        lore.add(Component.literal("§7Click to Toggle Confirmation, which will prevent"));
+        lore.add(Component.literal("§7you from buying items until you confirm again!"));
+
+        if(!confirmation){
+            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
+        } else {
+            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)")).setLore(lore));
+        }
     }
 
     @Override
@@ -126,7 +144,7 @@ public class GenericShop extends SimpleGui {
 
         // Traversing Back
         if (index == BACK_BUTTON_SLOT) {
-            RewardsMenu g = new RewardsMenu(player);
+            RewardOptionsGUI g = new RewardOptionsGUI(player);
             g.open();
             return false;
         }
@@ -134,6 +152,24 @@ public class GenericShop extends SimpleGui {
         // Closing Menu
         if (index == CLOSE_BUTTON_SLOT)
             close();
+
+        if (index == CONFIRM_BUTTON_SLOT){
+            confirmation = !confirmation;
+
+            //Confirmation Button
+            ArrayList<Component> lore = new ArrayList<>();
+            lore.add(Component.literal(""));
+            lore.add(Component.literal("§7Click to Toggle Confirmation, which will prevent"));
+            lore.add(Component.literal("§7you from buying items until you confirm again!"));
+
+            if(!confirmation){
+                this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
+            } else {
+                this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)")).setLore(lore));
+            }
+
+            return false;
+        }
 
         // Reward selection check
         int slot = -1;
@@ -158,19 +194,31 @@ public class GenericShop extends SimpleGui {
             return false;
 
         // Check if the player has enough currency for the given reward
-        if (slot == -1 || ticketCount < reward.cost())
+        if (ticketCount < reward.cost())
             return false;
 
         // Process the transaction
         ItemStack prize = processReward(reward);
         // Check if the player has space, or if removing the tickets would give space for the item
-        int stacksize = 64;
-        int unfinishedStackCnt = inv.countItem(prize.getItem()) % stacksize;
+        int stackSize = 64;
+        int unfinishedStackCnt = inv.countItem(prize.getItem()) % stackSize;
+
+        if(type.isRight){
+            BuyAmountGUI g = new BuyAmountGUI(player, prize, new ItemStack(ModItems.PRIZE_TICKET, reward.cost()), this);
+            g.open();
+            return false;
+        }
+
+        if(confirmation){
+            ConfirmationGUI g = new ConfirmationGUI(player, prize, new ItemStack(ModItems.PRIZE_TICKET, reward.cost()), this);
+            g.open();
+            return false;
+        }
 
         if (
             inv.getFreeSlot() != -1 // Slots exist
-            || (ticketCount - reward.cost() % stacksize == 0) // Removing the tickets would give space
-            || (unfinishedStackCnt > 0 && ((stacksize - unfinishedStackCnt) >= prize.count())) // There exists a viable stack for this item
+            || (ticketCount - reward.cost() % stackSize == 0) // Removing the tickets would give space
+            || (unfinishedStackCnt > 0 && ((stackSize - unfinishedStackCnt) >= prize.count())) // There exists a viable stack for this item
         ) {
             // Add to inventory
             removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, reward.cost());
@@ -183,7 +231,7 @@ public class GenericShop extends SimpleGui {
         return false;
     }
 
-    private int removeNItemsFromContainer(Container c, Item item, int n) {
+    public int removeNItemsFromContainer(Container c, Item item, int n) {
         int remaining = n;
         for (int i = 0; remaining > 0 && i < c.getContainerSize(); i++) {
             ItemStack slot = c.getSlot(i).get();

@@ -4,13 +4,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 
-import com.gs.Items.ModItems;
 import com.gs.guis.GUIPresets.Reward;
 
 import eu.pb4.sgui.api.ClickType;
@@ -18,7 +16,7 @@ import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
-public class GenericShowcase extends SimpleGui {
+public class GenericShowcaseGUI extends SimpleGui {
     //Displays
     Reward[] display;
     Component[] components;
@@ -28,7 +26,7 @@ public class GenericShowcase extends SimpleGui {
     private static final int CLOSE_BUTTON_SLOT = (9*3)+4;
 
     // GUI Setup
-    public GenericShowcase(ServerPlayer player, Reward[] display, Component[] components) {
+    public GenericShowcaseGUI(ServerPlayer player, Reward[] display, Component[] components) {
         super(MenuType.GENERIC_9x4, player, false);
 
         this.display = display;
@@ -38,7 +36,7 @@ public class GenericShowcase extends SimpleGui {
         this.setupMainMenu();
     }
 
-    public GenericShowcase(ServerPlayer player) {
+    public GenericShowcaseGUI(ServerPlayer player) {
         super(MenuType.GENERIC_9x4, player, false);
 
         this.setTitle(Component.literal("Showcase"));
@@ -78,7 +76,7 @@ public class GenericShowcase extends SimpleGui {
             close();
 
         return true;
-        }
+    }
 
     private int displaySlot(int slot){
         //First slot + Available Row Slots * Row Number
