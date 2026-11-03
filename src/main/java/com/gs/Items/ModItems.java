@@ -25,6 +25,7 @@ public class ModItems {
     public static final Item ENERGY_CUBE = register(ModItemIDs.ENERGY_CUBE, EnergyCube::new, new Item.Properties());
     public static final Item RUSTED_CROWN = register(ModItemIDs.RUSTED_CROWN, RustedCrown::new, new Item.Properties());
     public static final Item ASTRO_COIN = register(ModItemIDs.ASTRO_COIN, AstroCoin::new, new Item.Properties());
+    public static final Item ASPECT_OF_THE_VOID = register(ModItemIDs.ASPECT_OF_THE_VOID, AspectOfTheVoid::new, new Item.Properties());
 
 
     public static void initialize() {

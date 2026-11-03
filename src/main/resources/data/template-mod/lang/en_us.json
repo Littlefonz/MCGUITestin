@@ -13,5 +13,7 @@
   "item.gs-server-mod.energy_cube": "§bEnergy Cube",
   "item.gs-server-mod.energy_cube.info": "Rare Currency found from Necromerger",
   "item.gs-server-mod.rusted_crown": "§eRusted Crown",
-  "item.gs-server-mod.rusted_crown.info": "The Regal Artifact leftover from an Apocalypse"
+  "item.gs-server-mod.rusted_crown.info": "The Regal Artifact leftover from an Apocalypse",
+  "item.gs-server-mod.aspect_of_the_void": "§bAspect of the Void",
+  "item.gs-server-mod.aspect_of_the_void.info": "This one will be fun!"
 }

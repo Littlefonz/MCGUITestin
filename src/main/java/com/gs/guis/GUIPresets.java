@@ -73,6 +73,7 @@ public class GUIPresets {
     public static final Reward[] CUSTOM_REWARDS = {
         Reward.get(1, ModItems.WHEEL_TOKEN).from(1, ModItems.PRIZE_TICKET),
         Reward.get(1, ModItems.ARTIFACT_VOUCHER).from(5, ModItems.PRIZE_TICKET),
+            Reward.get(1, ModItems.ASPECT_OF_THE_VOID).from(512, Items.ENDER_EYE)
     };
 
     //Vanilla GUI Components

@@ -19,4 +19,5 @@ public class ModItemIDs {
     public static final ResourceKey<Item> ENERGY_CUBE = create("energy_cube");
     public static final ResourceKey<Item> RUSTED_CROWN = create("rusted_crown");
     public static final ResourceKey<Item> ASTRO_COIN = create("astro_coin");
+    public static final ResourceKey<Item> ASPECT_OF_THE_VOID = create("aspect_of_the_void");
 }
