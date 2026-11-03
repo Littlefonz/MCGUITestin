@@ -1,6 +1,7 @@
 package com.gs.guis;
 
 import com.gs.Items.ModItems;
+import com.gs.guis.GUIPresets.Reward;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,8 +21,8 @@ public class BuyAmountGUI extends SimpleGui {
 
     ShopSettings settings;
 
-    ItemStack prize;
-    ItemStack token;
+    Reward origReward;
+    Reward[] rewards;
     GenericShopGUI g;
 
     //Confirmation Check
@@ -34,14 +35,14 @@ public class BuyAmountGUI extends SimpleGui {
     private static final int[] BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8 };
     private static final int[] BUY_SLOTS = { 11, 12, 13, 14, 15 };
 
-    public BuyAmountGUI(ServerPlayer player, ShopSettings settings, ItemStack prize, ItemStack token, GenericShopGUI g){
+    public BuyAmountGUI(ServerPlayer player, ShopSettings settings, Reward r, int costCount, GenericShopGUI g){
         super(MenuType.GENERIC_9x3, player, false);
         this.setTitle(Component.literal("Select Buy Amount"));
 
         this.settings = settings;
-        this.prize = prize;
-        this.token = token;
         this.g = g;
+        this.origReward = r;
+        this.rewards = getRewards(r, costCount);
 
         setupMainMenu();
     }
@@ -60,6 +61,23 @@ public class BuyAmountGUI extends SimpleGui {
         }
     }
 
+    private Reward[] getRewards(Reward reward, int budget) {
+        int CAPACITY = 5; // number of possible rewards
+
+        Reward[] rewards = new Reward[5];
+
+        for (int i = 0; i < CAPACITY; i++) {
+            int multiplier = (int) Math.pow(2, i + 1);
+            int newCount = reward.count() * multiplier;
+            int newCost = reward.cost() * multiplier;
+            if (budget < newCost)
+                break;
+
+            rewards[i] = new Reward(newCount, reward.item(), newCost, reward.offer());
+        }
+        return rewards;
+    }
+
     private void setupMainMenu() {
         //Background Setup
         for (int s = 0; s < 27; s++){
@@ -73,16 +91,30 @@ public class BuyAmountGUI extends SimpleGui {
                     new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()).hideTooltip());
 
         //Buy Slots
-        int buyAmount = 2;
-        for (int s : BUY_SLOTS){
-            ArrayList<Component> lore = new ArrayList<>();
+        for (int i = 0; i < BUY_SLOTS.length; i++) {
+            Reward r = rewards[i];
 
-            lore.add(Component.literal("§7Cost: " + token.getCount() * buyAmount + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + "s"));
-            lore.add(Component.literal(""));
-            lore.add(Component.literal("§eClick to Buy!"));
-            this.setSlot(s,
-                    new GuiElementBuilder(prize.getItem()).setName(Component.literal(buyAmount * prize.getCount() + "x " + prize.getHoverName().getString())).setCount(buyAmount * prize.getCount()).setLore(lore));
-            buyAmount *= 2;
+            int s = BUY_SLOTS[i];
+
+            ArrayList<Component> lore = new ArrayList<>();
+            if (r != null) {
+                lore.add(Component.literal("§7Cost: " + r.cost() + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + "s"));
+                lore.add(Component.literal(""));
+                lore.add(Component.literal("§eClick to Buy!"));
+                Component name = Component.literal("§l" + r.count() + "x §r" + r.item().getDefaultInstance().getHoverName().getString());
+                this.setSlot(s, new GuiElementBuilder(r.stack()).setName(name).setLore(lore));
+            } else {
+                int cost = origReward.cost() * (int) Math.pow(2, i + 1);
+                int count = origReward.count() * (int) Math.pow(2, i + 1);
+                lore.add(Component.literal("§cCost: " + cost + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + "s"));
+                lore.add(Component.literal(""));
+                lore.add(Component.literal("§4Not enough " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + "s!"));
+                Component name = Component.literal("§l" + count + "x §r" + origReward.item().getDefaultInstance().getHoverName().getString());
+                ItemStack stack = origReward.stack();
+                stack.setCount(1);
+                this.setSlot(s, new GuiElementBuilder(stack).setName(name).setLore(lore));
+            }
+
         }
 
         //Back Button
@@ -101,8 +133,10 @@ public class BuyAmountGUI extends SimpleGui {
             return false;
 
         // Closing Menu
-        if (index == BACK_BUTTON_SLOT)
-            close();
+        if (index == BACK_BUTTON_SLOT) {
+            g.confirm(false);
+            return false;
+        }
 
         // Closing Menu
         if (index == CLOSE_BUTTON_SLOT)
@@ -126,28 +160,25 @@ public class BuyAmountGUI extends SimpleGui {
             return false;
         }
 
-        ItemStack tempPrize = prize.copy();
-        ItemStack tempToken = token.copy();
-        int buyAmount = 2;
+        for(int i = 0; i < BUY_SLOTS.length; i++){
+            int s = BUY_SLOTS[i];
 
-        for(int s : BUY_SLOTS){
+            if (index == s) {
+                Reward r = rewards[i];
+                if (r == null) // Selected reward is not available; they do not have enough to purchase
+                    break;
 
-            tempPrize.setCount(tempPrize.getCount() * buyAmount);
-            tempToken.setCount(tempToken.getCount() * buyAmount);
+                this.g.selection = this.g.selection.withReward(r); // update prize selection
 
-            if(confirmation && index == s){
-                ConfirmationGUI g = new ConfirmationGUI(player, tempPrize, tempToken, this.g);
-                g.open();
-                return false;
-            }
-
-            if(index == s){
-                player.getInventory().add(tempPrize);
-                g.removeNItemsFromContainer(player.getInventory(), tempToken.getItem(), tempToken.getCount());
+                if (confirmation) {
+                    new ConfirmationGUI(player, r, this.g).open();
+                    return false;
+                } else {
+                    g.confirm(true);
+                }
             }
         }
 
         return true;
     }
-
 }

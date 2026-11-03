@@ -7,26 +7,28 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-import java.util.ArrayList;
+import com.gs.guis.GUIPresets.Reward;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
+interface Confirmable {
+    void confirm(boolean b);
+}
+
 public class ConfirmationGUI extends SimpleGui {
 
-    ItemStack prize;
-    ItemStack token;
-    GenericShopGUI g;
+    Reward reward;
+    Confirmable conf;
 
-    public ConfirmationGUI(ServerPlayer player, ItemStack prize, ItemStack token, GenericShopGUI g){
+    public ConfirmationGUI(ServerPlayer player, Reward reward, Confirmable g){
         super(MenuType.GENERIC_9x3, player, false);
         this.setTitle(Component.literal("Exchange for this item?"));
 
-        this.prize = prize;
-        this.token = token;
-        this.g = g;
+        this.reward = reward;
+        this.conf = g;
 
         setupMainMenu();
     }
@@ -43,19 +45,18 @@ public class ConfirmationGUI extends SimpleGui {
         }
 
         this.setSlot(DENY, new GuiElementBuilder(Items.CONCRETE.red()).setName(Component.literal("Deny")));
-        this.setSlot(ITEM, new GuiElementBuilder(prize).setName(Component.literal(prize.getCount() + "x " + prize.getHoverName().getString())).setCount(prize.getCount()));
+        Component name = Component.literal("§l" + reward.count() + "x §r" + reward.item().getDefaultInstance().getHoverName().getString());
+        this.setSlot(ITEM, new GuiElementBuilder(reward.stack()).setName(name));
         this.setSlot(CONFIRM, new GuiElementBuilder(Items.CONCRETE.green()).setName(Component.literal("Confirm")));
     }
 
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
         if(index == DENY){
-            g.open();
+            conf.confirm(false);
             return true;
         } else if(index == CONFIRM){
-            player.getInventory().add(prize);
-            g.removeNItemsFromContainer(player.getInventory(), token.getItem(), token.count());
-            g.open();
+            conf.confirm(true);
             return true;
         }
 

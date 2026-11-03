@@ -32,7 +32,7 @@ import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
-public class GenericShopGUI extends SimpleGui {
+public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable {
 
     // Shop state
     SimpleGui parent;
@@ -42,6 +42,11 @@ public class GenericShopGUI extends SimpleGui {
     Reward[] rewards;
     String components;
     Item title;
+
+    static record CurrentSelection(Reward reward, int budget) {
+        CurrentSelection withReward(Reward newR) { return new CurrentSelection(newR, budget); }
+    }
+    CurrentSelection selection;
 
     //UI Locations
     private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
@@ -93,19 +98,19 @@ public class GenericShopGUI extends SimpleGui {
     private void setupMainMenu() {
         //Reward Section
         for (int s = 0; s < rewards.length; s++) {
-            Reward reward = rewards[s];
+            Reward r = rewards[s];
             //Fix suffix for 1x items
             String suffix = "s";
             if(rewards[s].cost() == 1) suffix = "";
 
             //Display
             ArrayList<Component> lore = new ArrayList<>();
-            lore.add(Component.literal("§7Cost: " + rewards[s].cost() + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + suffix));
+            lore.add(Component.literal("§7Cost: " + r.cost() + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + suffix));
             lore.add(Component.literal(""));
             lore.add(Component.literal("§eLeft Click to Exchange!"));
             lore.add(Component.literal("§eRight Click to Bulk Exchange!"));
-            Component name = Component.literal("§l" + rewards[s].count() + "x §r" + rewards[s].item().getDefaultInstance().getHoverName().getString());
-            this.setSlot(rewardSlot(s), new GuiElementBuilder(reward.stack()).setName(name).setLore(lore));
+            Component name = Component.literal("§l" + r.count() + "x §r" + r.item().getDefaultInstance().getHoverName().getString());
+            this.setSlot(rewardSlot(s), new GuiElementBuilder(r.stack()).setName(name).setLore(lore));
         }
 
         //Gray Border
@@ -169,12 +174,11 @@ public class GenericShopGUI extends SimpleGui {
         // Reward selection check
         int slot = -1;
         // Find & check if the player selected a reward slot
-        for (int i = 0; i < rewards.length; i++){
+        for (int i = 0; i < rewards.length; i++)
             if (index == rewardSlot(i)) {
                 slot = i;
                 break;
             }
-        }
         if (slot == -1)
             return false;
 
@@ -192,28 +196,44 @@ public class GenericShopGUI extends SimpleGui {
         if (ticketCount < reward.cost())
             return false;
 
-        // Process the transaction
-        ItemStack prize = processReward(reward);
-        // Check if the player has space, or if removing the tickets would give space for the item
-        int stackSize = 64;
-        int unfinishedStackCnt = inv.countItem(prize.getItem()) % stackSize;
+        this.selection = new CurrentSelection(reward, ticketCount);
 
         if(type.isRight){
-            BuyAmountGUI g = new BuyAmountGUI(player, settings, prize, new ItemStack(ModItems.PRIZE_TICKET, reward.cost()), this);
-            g.open();
+            new BuyAmountGUI(player, settings, reward, ticketCount, this).open();
             return false;
         }
 
         if(settings.confirmation){
-            ConfirmationGUI g = new ConfirmationGUI(player, prize, new ItemStack(ModItems.PRIZE_TICKET, reward.cost()), this);
-            g.open();
+            new ConfirmationGUI(player, reward, this).open();
             return false;
         }
 
+        // Otherwise continue as usual
+        this.confirm(true);
+
+        return false;
+    }
+
+    public void confirm(boolean confirmed) {
+        if (!isOpen()) {
+            updateSettings();
+            open();
+        }
+        if (!confirmed)
+            return;
+
+        // Process the transaction
+        Inventory inv = player.getInventory();
+        Reward reward = selection.reward;
+        int budget = selection.budget;
+        ItemStack prize = processReward(reward);
+
+        // Check if the player has space, or if removing the tickets would give space for the item
+        int unfinishedStackCnt = inv.countItem(prize.getItem()) % 64;
         if (
             inv.getFreeSlot() != -1 // Slots exist
-            || (ticketCount - reward.cost() % stackSize == 0) // Removing the tickets would give space
-            || (unfinishedStackCnt > 0 && ((stackSize - unfinishedStackCnt) >= prize.count())) // There exists a viable stack for this item
+            || (budget - reward.cost() % 64 == 0) // Removing the tickets would give space
+            || (unfinishedStackCnt > 0 && ((64 - unfinishedStackCnt) >= prize.count())) // There exists a viable stack for this item
         ) {
             // Add to inventory
             removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, reward.cost());
@@ -223,7 +243,6 @@ public class GenericShopGUI extends SimpleGui {
             removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, reward.cost());
             player.drop(prize, true, Prediction.SERVER_ONLY);
         }
-        return false;
     }
 
     public int removeNItemsFromContainer(Container c, Item item, int n) {

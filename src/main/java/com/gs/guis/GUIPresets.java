@@ -9,6 +9,12 @@ import net.minecraft.world.item.Items;
 public class GUIPresets {
 
     public record Reward(int count, Item item, int cost, Item offer) {
+        public Reward(Item item, int count) {
+            this(count, item, 0, null); // Default is free
+        }
+
+        public Reward withCount(int newCount) { return new Reward(newCount, item, cost, offer); }
+
         public static Reward get(int count, Item item) {
             return new Reward(count, item, 0, null);
         }
@@ -16,10 +22,6 @@ public class GUIPresets {
         public Reward from(int cost, Item offer) {
             assert offer != null;
             return new Reward(count, item, cost, offer);
-        }
-
-        public Reward(Item item, int count) {
-            this(count, item, 0, null); // Default is free
         }
 
         public ItemStack stack() {
@@ -73,7 +75,7 @@ public class GUIPresets {
     public static final Reward[] CUSTOM_REWARDS = {
         Reward.get(1, ModItems.WHEEL_TOKEN).from(1, ModItems.PRIZE_TICKET),
         Reward.get(1, ModItems.ARTIFACT_VOUCHER).from(5, ModItems.PRIZE_TICKET),
-            Reward.get(1, ModItems.ASPECT_OF_THE_VOID).from(512, Items.ENDER_EYE)
+        Reward.get(1, ModItems.ASPECT_OF_THE_VOID).from(512, Items.ENDER_EYE)
     };
 
     //Vanilla GUI Components
