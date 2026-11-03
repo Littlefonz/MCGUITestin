@@ -34,13 +34,14 @@ import eu.pb4.sgui.api.gui.SimpleGui;
 
 public class GenericShopGUI extends SimpleGui {
 
+    // Shop state
+    SimpleGui parent;
+    ShopSettings settings;
+
     //Rewards
     Reward[] rewards;
     String components;
     Item title;
-
-    //Confirmation Check
-    boolean confirmation = true;
 
     //UI Locations
     private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
@@ -75,9 +76,12 @@ public class GenericShopGUI extends SimpleGui {
                     MapDecorationTypes.ANCIENT_CITY));
 
     // GUI Setup
-    public GenericShopGUI(ServerPlayer player, Reward[] rewards, Item title, String components) {
+    public GenericShopGUI(SimpleGui parent, ServerPlayer player, ShopSettings settings, Reward[] rewards, Item title, String components) {
         super(MenuType.GENERIC_9x6, player, false);
 
+        this.parent = parent;
+
+        this.settings = settings;
         this.rewards = rewards;
         this.components = components;
         this.title = title;
@@ -123,16 +127,20 @@ public class GenericShopGUI extends SimpleGui {
         //Close Button
         this.setSlot(CLOSE_BUTTON_SLOT, new GuiElementBuilder(Items.BARRIER).setName(Component.literal("Close")));
 
+        updateSettings();
+    }
+
+    public void updateSettings() {
         //Confirmation Button
         ArrayList<Component> lore = new ArrayList<>();
         lore.add(Component.literal(""));
         lore.add(Component.literal("§7Click to Toggle Confirmation, which will prevent"));
         lore.add(Component.literal("§7you from buying items until you confirm again!"));
 
-        if(!confirmation){
-            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
-        } else {
+        if (settings.confirmation) {
             this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)")).setLore(lore));
+        } else {
+            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
         }
     }
 
@@ -144,8 +152,7 @@ public class GenericShopGUI extends SimpleGui {
 
         // Traversing Back
         if (index == BACK_BUTTON_SLOT) {
-            RewardOptionsGUI g = new RewardOptionsGUI(player);
-            g.open();
+            parent.open();
             return false;
         }
 
@@ -154,20 +161,8 @@ public class GenericShopGUI extends SimpleGui {
             close();
 
         if (index == CONFIRM_BUTTON_SLOT){
-            confirmation = !confirmation;
-
-            //Confirmation Button
-            ArrayList<Component> lore = new ArrayList<>();
-            lore.add(Component.literal(""));
-            lore.add(Component.literal("§7Click to Toggle Confirmation, which will prevent"));
-            lore.add(Component.literal("§7you from buying items until you confirm again!"));
-
-            if(!confirmation){
-                this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
-            } else {
-                this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)")).setLore(lore));
-            }
-
+            this.settings.confirmation = !this.settings.confirmation;
+            updateSettings();
             return false;
         }
 
@@ -204,12 +199,12 @@ public class GenericShopGUI extends SimpleGui {
         int unfinishedStackCnt = inv.countItem(prize.getItem()) % stackSize;
 
         if(type.isRight){
-            BuyAmountGUI g = new BuyAmountGUI(player, prize, new ItemStack(ModItems.PRIZE_TICKET, reward.cost()), this);
+            BuyAmountGUI g = new BuyAmountGUI(player, settings, prize, new ItemStack(ModItems.PRIZE_TICKET, reward.cost()), this);
             g.open();
             return false;
         }
 
-        if(confirmation){
+        if(settings.confirmation){
             ConfirmationGUI g = new ConfirmationGUI(player, prize, new ItemStack(ModItems.PRIZE_TICKET, reward.cost()), this);
             g.open();
             return false;

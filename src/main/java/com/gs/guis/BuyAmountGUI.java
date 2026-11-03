@@ -18,6 +18,8 @@ import eu.pb4.sgui.api.gui.SimpleGui;
 
 public class BuyAmountGUI extends SimpleGui {
 
+    ShopSettings settings;
+
     ItemStack prize;
     ItemStack token;
     GenericShopGUI g;
@@ -32,15 +34,30 @@ public class BuyAmountGUI extends SimpleGui {
     private static final int[] BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8 };
     private static final int[] BUY_SLOTS = { 11, 12, 13, 14, 15 };
 
-    public BuyAmountGUI(ServerPlayer player, ItemStack prize, ItemStack token, GenericShopGUI g){
+    public BuyAmountGUI(ServerPlayer player, ShopSettings settings, ItemStack prize, ItemStack token, GenericShopGUI g){
         super(MenuType.GENERIC_9x3, player, false);
         this.setTitle(Component.literal("Select Buy Amount"));
 
+        this.settings = settings;
         this.prize = prize;
         this.token = token;
         this.g = g;
 
         setupMainMenu();
+    }
+
+    private void updateSettings() {
+        //Confirmation Button
+        ArrayList<Component> lore = new ArrayList<>();
+        lore.add(Component.literal(""));
+        lore.add(Component.literal("§7Click to Toggle Confirmation, which will prevent"));
+        lore.add(Component.literal("§7you from buying items until you confirm again!"));
+
+        if(settings.confirmation){
+            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)")).setLore(lore));
+        } else {
+            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
+        }
     }
 
     private void setupMainMenu() {
@@ -68,23 +85,13 @@ public class BuyAmountGUI extends SimpleGui {
             buyAmount *= 2;
         }
 
-        //Confirmation Button
-        ArrayList<Component> lore = new ArrayList<>();
-        lore.add(Component.literal(""));
-        lore.add(Component.literal("§7Click to Toggle Confirmation, which will prevent"));
-        lore.add(Component.literal("§7you from buying items until you confirm again!"));
-
-        if(!confirmation){
-            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
-        } else {
-            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)")).setLore(lore));
-        }
-
         //Back Button
         this.setSlot(BACK_BUTTON_SLOT, new GuiElementBuilder(Items.ARROW).setName(Component.literal("Back")));
 
         //Close Button
         this.setSlot(CLOSE_BUTTON_SLOT, new GuiElementBuilder(Items.BARRIER).setName(Component.literal("Close")));
+
+        updateSettings();
     }
 
     @Override

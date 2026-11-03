@@ -17,8 +17,12 @@ import net.minecraft.world.item.Items;
 
 public class RewardOptionsGUI extends SimpleGui {
 
+    ShopSettings settings;
+
     public RewardOptionsGUI(ServerPlayer player) {
         super(MenuType.GENERIC_9x3, player, false);
+
+        settings = new ShopSettings();
 
         this.setTitle(Component.literal("Reward Menu"));
         this.setupMainMenu();
@@ -54,13 +58,15 @@ public class RewardOptionsGUI extends SimpleGui {
 
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
-        // Make sure the user is not trying to grab the divider
+        if (index == CLOSE_BUTTON_SLOT)
+            close();
+
         GenericShopGUI g;
         if (index == CUSTOM_SLOTS[0]){
-            g = new GenericShopGUI(player, CUSTOM_REWARDS, COMPONENT_MODELS[0], COMPONENTS[0]);
+            g = new GenericShopGUI(this, player, settings, CUSTOM_REWARDS, COMPONENT_MODELS[0], COMPONENTS[0]);
             g.open();
         } else if (index == CUSTOM_SLOTS[1]){
-            g = new GenericShopGUI(player, VANILLA_REWARDS, COMPONENT_MODELS[1], COMPONENTS[1]);
+            g = new GenericShopGUI(this, player, settings, VANILLA_REWARDS, COMPONENT_MODELS[1], COMPONENTS[1]);
             g.open();
         }
 
