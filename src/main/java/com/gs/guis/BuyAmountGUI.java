@@ -25,9 +25,6 @@ public class BuyAmountGUI extends SimpleGui {
     Reward[] rewards;
     GenericShopGUI g;
 
-    //Confirmation Check
-    boolean confirmation = true;
-
     private static final int BACK_BUTTON_SLOT = 21;
     private static final int CLOSE_BUTTON_SLOT = 22;
     private static final int CONFIRM_BUTTON_SLOT = (9*2)+5;
@@ -134,7 +131,7 @@ public class BuyAmountGUI extends SimpleGui {
 
         // Closing Menu
         if (index == BACK_BUTTON_SLOT) {
-            g.confirm(false);
+            g.confirm(false, origReward);
             return false;
         }
 
@@ -143,7 +140,7 @@ public class BuyAmountGUI extends SimpleGui {
             close();
 
         if (index == CONFIRM_BUTTON_SLOT){
-            confirmation = !confirmation;
+            settings.confirmation = !settings.confirmation;
 
             //Confirmation Button
             ArrayList<Component> lore = new ArrayList<>();
@@ -151,7 +148,7 @@ public class BuyAmountGUI extends SimpleGui {
             lore.add(Component.literal("§7Click to Toggle Confirmation, which will prevent"));
             lore.add(Component.literal("§7you from buying items until you confirm again!"));
 
-            if(!confirmation){
+            if(!settings.confirmation){
                 this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
             } else {
                 this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)")).setLore(lore));
@@ -168,13 +165,11 @@ public class BuyAmountGUI extends SimpleGui {
                 if (r == null) // Selected reward is not available; they do not have enough to purchase
                     break;
 
-                this.g.selection = this.g.selection.withReward(r); // update prize selection
-
-                if (confirmation) {
-                    new ConfirmationGUI(player, r, this.g).open();
+                if (settings.confirmation) {
+                    new ConfirmationGUI<>(player, r, this.g, r).open();
                     return false;
                 } else {
-                    g.confirm(true);
+                    g.confirm(true, r);
                 }
             }
         }

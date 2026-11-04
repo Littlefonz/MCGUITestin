@@ -2,8 +2,8 @@ package com.gs.guis;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Objects;
 
+import com.gs.GSServerMod;
 import com.gs.Items.ModItems;
 import com.gs.guis.GUIPresets.Reward;
 
@@ -32,7 +32,7 @@ import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
-public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable {
+public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable<Reward> {
 
     // Shop state
     SimpleGui parent;
@@ -42,11 +42,6 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
     Reward[] rewards;
     String components;
     Item title;
-
-    static record CurrentSelection(Reward reward, int budget) {
-        CurrentSelection withReward(Reward newR) { return new CurrentSelection(newR, budget); }
-    }
-    CurrentSelection selection;
 
     //UI Locations
     private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
@@ -59,7 +54,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
     //Mapping
     private record MapType(TagKey<Structure> tag, Holder<MapDecorationType> decoration) {}
     private static final Map<Item, MapType> MAP_TYPES = Map.of(
-            Items.ABANDONED_CAMP_MAP,   new MapType(StructureTags.ON_ABANDONED_CAMP_SWAMP_MAPS, // TODO make this variable!!!
+            Items.ABANDONED_CAMP_MAP,   new MapType(StructureTags.ABANDONED_CAMP,
                     MapDecorationTypes.ABANDONED_CAMP),
             Items.BURIED_MINESHAFT_MAP, new MapType(StructureTags.ON_MINESHAFT_MAPS,
                     MapDecorationTypes.MINESHAFT),
@@ -171,7 +166,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
             return false;
         }
 
-        // Reward selection check
+        // Reward selection
         int slot = -1;
         // Find & check if the player selected a reward slot
         for (int i = 0; i < rewards.length; i++)
@@ -179,42 +174,42 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
                 slot = i;
                 break;
             }
-        if (slot == -1)
+        if (slot != -1) {
+            rewardPreCheck(slot, type);
             return false;
+        }
 
-        // REWARD SECTION
+        return false;
+    }
 
+    public void rewardPreCheck(int slot, ClickType type) {
         Reward reward = rewards[slot];
         Inventory inv = player.getInventory();
 
         // Player currency count
         int ticketCount = inv.countItem(ModItems.PRIZE_TICKET);
         if (ticketCount <= 0) // How did we get here...?
-            return false;
+            return;
 
         // Check if the player has enough currency for the given reward
         if (ticketCount < reward.cost())
-            return false;
-
-        this.selection = new CurrentSelection(reward, ticketCount);
+            return;
 
         if(type.isRight){
             new BuyAmountGUI(player, settings, reward, ticketCount, this).open();
-            return false;
+            return;
         }
 
         if(settings.confirmation){
-            new ConfirmationGUI(player, reward, this).open();
-            return false;
+            new ConfirmationGUI<>(player, reward, this, reward).open();
+            return;
         }
 
         // Otherwise continue as usual
-        this.confirm(true);
-
-        return false;
+        this.confirm(true, reward);
     }
 
-    public void confirm(boolean confirmed) {
+    public void confirm(boolean confirmed, Reward item) {
         if (!isOpen()) {
             updateSettings();
             open();
@@ -223,36 +218,32 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
             return;
 
         // Process the transaction
-        Inventory inv = player.getInventory();
-        Reward reward = selection.reward;
-        int budget = selection.budget;
-        ItemStack prize = processReward(reward);
+        processReward(player, item);
 
-        // Check if the player has space, or if removing the tickets would give space for the item
-        int unfinishedStackCnt = inv.countItem(prize.getItem()) % 64;
-        if (
-            inv.getFreeSlot() != -1 // Slots exist
-            || (budget - reward.cost() % 64 == 0) // Removing the tickets would give space
-            || (unfinishedStackCnt > 0 && ((64 - unfinishedStackCnt) >= prize.count())) // There exists a viable stack for this item
-        ) {
-            // Add to inventory
-            removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, reward.cost());
-            inv.add(prize);
-        } else {
-            // Drop on the ground
-            removeNItemsFromContainer(inv, ModItems.PRIZE_TICKET, reward.cost());
-            player.drop(prize, true, Prediction.SERVER_ONLY);
+    }
+
+    private static void giveToPlayer(ServerPlayer player, Inventory inv, ItemStack stack) {
+        if (stack.isEmpty()) return;
+        if (inv.getFreeSlot() == -1 && inv.getSlotWithRemainingSpace(stack) == -1) {
+            player.drop(stack, true, Prediction.SERVER_ONLY);
+            return;
+        }
+
+        inv.add(stack); // mutates stack to report remaining items
+        if (!stack.isEmpty()) { // Stack is always empty after `inv.add()` in creative mode! works properly in survival.
+            giveToPlayer(player, inv, stack);
         }
     }
 
     public int removeNItemsFromContainer(Container c, Item item, int n) {
         int remaining = n;
-        for (int i = 0; remaining > 0 && i < c.getContainerSize(); i++) {
-            ItemStack slot = c.getSlot(i).get();
-            if (slot.isEmpty() || slot.getItem() != item)
+        int size = c.getContainerSize();
+        for (int i = 0; remaining > 0 && i < size; i++) {
+            ItemStack stack = c.getSlot(i).get();
+            if (stack.isEmpty() || !ItemStack.isSameItemSameComponents(stack, item.getDefaultInstance()))
                 continue;
 
-            int removedCount = Math.min(slot.count(), remaining);
+            int removedCount = Math.min(stack.count(), remaining);
             c.removeItem(i, removedCount);
             remaining = Math.max(remaining - removedCount, 0);
         }
@@ -266,30 +257,64 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         return 10 + (slot % 7) + (slot / 7) * 9;
     }
 
-    private ItemStack processReward(Reward reward) {
-        // Check if the reward is a map and handle it accordingly
+    private void processReward(ServerPlayer player, Reward reward) {
+        Inventory inv = player.getInventory();
         MapType type = MAP_TYPES.get(reward.item());
         if (type != null) {
-            return filledMap(type, reward.item(), reward.count());
+            processMap(inv, type, reward);
+            return;
         }
 
-        // Else return the reward
-        return reward.stack();
+        processSimpleReward(inv, reward);
     }
 
-    private ItemStack filledMap(MapType type, Item originalItem, int amount) {
+    private void processMap(Inventory inv, MapType type, Reward reward) {
+        int i = 0;
+        int count = reward.count();
+        int cost = 0;
+        while (i < count) {
+            ItemStack map = fillMap(type, reward.item());
+            if (map == null) break; // map type was not found around the player
+
+            // Careful! possible unintended flooring?
+            // SHOULD be usable with maps and simple things as the ratio is 1-to-1
+            int partialCost = reward.cost() / reward.count();
+            cost += partialCost;
+            removeNItemsFromContainer(player.getInventory(), reward.offer(), partialCost);
+            giveToPlayer(player, inv, map);
+            i++;
+        }
+        GSServerMod.LOGGER.info(String.format(
+            "Traded with %s %s",
+            player.nameAndId().name(),
+            new Reward(i, reward.item(), cost, reward.offer()).getString()
+        ));
+    }
+
+    private void processSimpleReward(Inventory inv, Reward reward) {
+        removeNItemsFromContainer(player.getInventory(), reward.offer(), reward.cost());
+        giveToPlayer(player, inv, reward.stack());
+        GSServerMod.LOGGER.info(String.format(
+            "Traded with %s %s",
+            player.nameAndId().name(),
+            reward.getString()
+        ));
+    }
+
+    private ItemStack fillMap(MapType type, Item originalItem) {
         // Maps
         ServerLevel level = player.level();
 
         BlockPos pos = level.findNearestMapStructure(type.tag(), player.blockPosition(), 100, true);
 
         if (pos == null) {
-            System.out.println("No structure found nearby for this map");
+            GSServerMod.LOGGER.error("No structure found nearby for this map!");
+            player.sendSystemMessage(Component.literal("No structure found nearby for this map!"));
             return null;
         }
+        GSServerMod.LOGGER.debug("Generated structure map of type ", type);
 
         ItemStack map = originalItem.getDefaultInstance();
-        map.setCount(amount);
 
         MapItem.applyNewSavedData(level, map, pos.getX(), pos.getZ(), (byte) 2, true, true);
         MapItem.renderBiomePreviewMap(level, map);

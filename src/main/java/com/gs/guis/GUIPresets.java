@@ -10,13 +10,13 @@ public class GUIPresets {
 
     public record Reward(int count, Item item, int cost, Item offer) {
         public Reward(Item item, int count) {
-            this(count, item, 0, null); // Default is free
+            this(count, item, 0, ModItems.PRIZE_TICKET); // Default is free
         }
 
         public Reward withCount(int newCount) { return new Reward(newCount, item, cost, offer); }
 
         public static Reward get(int count, Item item) {
-            return new Reward(count, item, 0, null);
+            return new Reward(count, item, 0, ModItems.PRIZE_TICKET);
         }
 
         public Reward from(int cost, Item offer) {
@@ -26,6 +26,15 @@ public class GUIPresets {
 
         public ItemStack stack() {
             return new ItemStack(item, count);
+        }
+
+        public String getString() {
+            return String.format("[%s]x%d -> [%s]x%d",
+                offer.getDefaultInstance().getHoverName().getString(),
+                cost,
+                item.getDefaultInstance().getHoverName().getString(),
+                count
+            );
         }
     }
 
