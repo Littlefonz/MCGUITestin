@@ -1,6 +1,8 @@
 package com.gs;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.Commands;
 import net.minecraft.resources.Identifier;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.gs.Items.ModItems;
 import com.gs.guis.RewardOptionsGUI;
+import com.gs.guis.ShopSettings;
 
 public class GSServerMod implements ModInitializer {
 	public static final String MOD_ID = "gs-server-mod";
@@ -21,6 +24,15 @@ public class GSServerMod implements ModInitializer {
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+	// Saving user data
+	public static final AttachmentType<ShopSettings> SHOP_SETTINGS_ATTACHMENT = AttachmentRegistry.create(
+	    GSServerMod.id("shop_settings"),
+		builder -> builder
+		    .persistent(ShopSettings.CODEC)
+		    .copyOnDeath()
+		    .initializer(() -> new ShopSettings())
+	);
 
 	@Override
 	public void onInitialize() {

@@ -4,6 +4,8 @@ package com.gs.guis;
 import static com.gs.guis.GUIPresets.CUSTOM_REWARDS;
 import static com.gs.guis.GUIPresets.VANILLA_REWARDS;
 
+import com.gs.GSServerMod;
+
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
@@ -22,7 +24,7 @@ public class RewardOptionsGUI extends SimpleGui {
     public RewardOptionsGUI(ServerPlayer player) {
         super(MenuType.GENERIC_9x3, player, false);
 
-        settings = new ShopSettings();
+        settings = player.getAttachedOrSet(GSServerMod.SHOP_SETTINGS_ATTACHMENT, new ShopSettings());
 
         this.setTitle(Component.literal("Reward Menu"));
         this.setupMainMenu();
@@ -56,10 +58,15 @@ public class RewardOptionsGUI extends SimpleGui {
         }
     }
 
+    protected void save_and_close() {
+        player.setAttached(GSServerMod.SHOP_SETTINGS_ATTACHMENT, settings);
+        close();
+    }
+
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
         if (index == CLOSE_BUTTON_SLOT)
-            close();
+            save_and_close();
 
         GenericShopGUI g;
         if (index == CUSTOM_SLOTS[0]){

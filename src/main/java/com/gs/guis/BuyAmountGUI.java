@@ -1,5 +1,6 @@
 package com.gs.guis;
 
+import com.gs.GSServerMod;
 import com.gs.Items.ModItems;
 import com.gs.guis.GUIPresets.Reward;
 
@@ -123,6 +124,11 @@ public class BuyAmountGUI extends SimpleGui {
         updateSettings();
     }
 
+    protected void save_and_close() {
+        player.setAttached(GSServerMod.SHOP_SETTINGS_ATTACHMENT, settings);
+        close();
+    }
+
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
         // Only accept the Pickup action
@@ -137,7 +143,7 @@ public class BuyAmountGUI extends SimpleGui {
 
         // Closing Menu
         if (index == CLOSE_BUTTON_SLOT)
-            close();
+            save_and_close();
 
         if (index == CONFIRM_BUTTON_SLOT){
             settings.confirmation = !settings.confirmation;

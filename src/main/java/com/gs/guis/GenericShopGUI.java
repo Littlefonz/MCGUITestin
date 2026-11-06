@@ -144,6 +144,11 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         }
     }
 
+    protected void save_and_close() {
+        player.setAttached(GSServerMod.SHOP_SETTINGS_ATTACHMENT, settings);
+        close();
+    }
+
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
         // Only accept the Pickup action
@@ -158,7 +163,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
 
         // Closing Menu
         if (index == CLOSE_BUTTON_SLOT)
-            close();
+            save_and_close();
 
         if (index == CONFIRM_BUTTON_SLOT){
             this.settings.confirmation = !this.settings.confirmation;
