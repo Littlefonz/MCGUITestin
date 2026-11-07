@@ -9,7 +9,7 @@ import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 
-import com.gs.guis.GUIPresets.Trade;
+import com.gs.Trades.Trade;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;

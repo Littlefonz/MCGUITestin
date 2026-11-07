@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.gs.GSServerMod;
-import com.gs.guis.GUIPresets.Offer;
-import com.gs.guis.GUIPresets.Reward;
-import com.gs.guis.GUIPresets.Trade;
+import com.gs.Trades.Offer;
+import com.gs.Trades.Reward;
+import com.gs.Trades.Trade;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;

@@ -2,7 +2,7 @@ package com.gs.guis;
 
 import com.gs.GSServerMod;
 import com.gs.Items.ModItems;
-import com.gs.guis.GUIPresets.Trade;
+import com.gs.Trades.Trade;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
