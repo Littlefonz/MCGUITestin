@@ -22,7 +22,8 @@ public class BuyAmountGUI extends SimpleGui {
 
     ShopSettings settings;
 
-    Trade origReward;
+    Trade trade;
+    int affordableCnt;
     GenericShopGUI g;
 
     private static final int BACK_BUTTON_SLOT = 21;
@@ -38,7 +39,8 @@ public class BuyAmountGUI extends SimpleGui {
 
         this.settings = settings;
         this.g = g;
-        this.origReward = r;
+        this.trade = r;
+        this.affordableCnt = r.getAffordableCount(player);
 
         setupMainMenu();
     }
@@ -57,23 +59,6 @@ public class BuyAmountGUI extends SimpleGui {
         }
     }
 
-//    private Trade[] getRewards(Trade reward, int budget) {
-//        int CAPACITY = 5; // number of possible rewards
-//
-//        Trade[] rewards = new Trade[5];
-//
-//        for (int i = 0; i < CAPACITY; i++) {
-//            int multiplier = (int) Math.pow(2, i + 1);
-//            int newCount = reward.count(i) * multiplier;
-//            int newCost = reward.cost(i) * multiplier;
-//            if (budget < newCost)
-//                break;
-//
-//            rewards[i] = new Trade(newCount, reward.item(i), newCost, reward.offer(i));
-//        }
-//        return rewards;
-//    }
-
     private void setupMainMenu() {
         //Background Setup
         for (int s = 0; s < 27; s++){
@@ -88,16 +73,20 @@ public class BuyAmountGUI extends SimpleGui {
 
         //Buy Slots
         for (int i = 0; i < BUY_SLOTS.length; i++) {
-            Trade r = origReward;
+            int multiplier = Math.powExact(2, i + 1);
+            boolean affordable = multiplier <= affordableCnt;
+            Trade r = trade;
 
             int s = BUY_SLOTS[i];
 
-            ArrayList<Component> lore = r.defaultLore(i+1);
-            lore.add(Component.literal(""));
-            lore.add(Component.literal("§eClick to Buy!"));
+            GuiElementBuilder element = r.guiElement(multiplier);
+            element.addLoreLine(Component.empty());
+            if (affordable)
+                element.addLoreLine(Component.literal("§eClick to Buy!"));
+            else
+                element.addLoreLine(Component.literal("§cYou cannot afford this!"));
 
-            Component name = Component.literal("§l" + r.count(0) * Math.powExact(2, i+1) + "x §r" + r.item(0).getDefaultInstance().getHoverName().getString());
-            this.setSlot(s, new GuiElementBuilder(r.stack(0)).setName(name).setLore(lore));
+            this.setSlot(s, element);
 
         }
 
@@ -123,7 +112,7 @@ public class BuyAmountGUI extends SimpleGui {
 
         // Closing Menu
         if (index == BACK_BUTTON_SLOT) {
-            g.confirm(false, origReward);
+            g.confirm(false, trade);
             return false;
         }
 
@@ -153,15 +142,15 @@ public class BuyAmountGUI extends SimpleGui {
             int s = BUY_SLOTS[i];
 
             if (index == s) {
-                Trade r = origReward;
-                if (r == null) // Selected reward is not available; they do not have enough to purchase
+                int multiplier = Math.powExact(2, i + 1);
+                if (multiplier > affordableCnt) // Selected trade is not available; they do not have enough to purchase
                     break;
 
                 if (settings.confirmation) {
-                    new ConfirmationGUI<>(player, r, this.g, r).open();
+                    new ConfirmationGUI<>(player, trade.guiElement(multiplier), this.g, trade.multiply(multiplier)).open();
                     return false;
                 } else {
-                    g.confirm(true, r);
+                    g.confirm(true, trade.multiply(multiplier));
                 }
             }
         }

@@ -4,9 +4,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-
-import com.gs.guis.GUIPresets.Trade;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
@@ -19,23 +18,29 @@ interface Confirmable<T> {
 
 public class ConfirmationGUI<T> extends SimpleGui {
 
-    Trade reward;
+
+    GuiElementBuilder element;
     T item;
     Confirmable<T> conf;
 
-    public ConfirmationGUI(ServerPlayer player, Trade reward, Confirmable<T> g, T item){
+    public ConfirmationGUI(ServerPlayer player, ItemStack stack, Confirmable<T> g, T item){
+        this(player, new GuiElementBuilder(stack), g, item);
+    }
+    public ConfirmationGUI(ServerPlayer player, GuiElementBuilder guiElement, Confirmable<T> g, T item){
         super(MenuType.GENERIC_9x3, player, false);
         this.setTitle(Component.literal("Exchange for this item?"));
 
-        this.reward = reward;
+        this.element = guiElement;
+
         this.conf = g;
         this.item = item;
+        System.out.println(item);
 
         setupMainMenu();
     }
 
     private static final int DENY = 11;
-    private static final int ITEM = 13;
+    private static final int ELEMENT = 13;
     private static final int CONFIRM = 15;
 
     private void setupMainMenu() {
@@ -46,8 +51,7 @@ public class ConfirmationGUI<T> extends SimpleGui {
         }
 
         this.setSlot(DENY, new GuiElementBuilder(Items.CONCRETE.red()).setName(Component.literal("Deny")));
-        Component name = Component.literal("§l" + reward.count(0) + "x §r" + reward.item(0).getDefaultInstance().getHoverName().getString());
-        this.setSlot(ITEM, new GuiElementBuilder(reward.stack(0)).setName(name));
+        this.setSlot(ELEMENT, element);
         this.setSlot(CONFIRM, new GuiElementBuilder(Items.CONCRETE.green()).setName(Component.literal("Confirm")));
     }
 

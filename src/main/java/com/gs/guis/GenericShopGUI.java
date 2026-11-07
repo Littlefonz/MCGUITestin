@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.gs.GSServerMod;
+import com.gs.guis.GUIPresets.Offer;
+import com.gs.guis.GUIPresets.Reward;
 import com.gs.guis.GUIPresets.Trade;
 
 import net.minecraft.core.BlockPos;
@@ -38,10 +40,10 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
     SimpleGui parent;
     ShopSettings menuSettings;
 
-    //Rewards
-    Trade[] rewardSlot;
+    // Trades
+    Trade[] trades;
 
-    //UI Locations
+    // UI Locations
     private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
     private static final int[] GREY_BORDER = { 1, 2, 3, 4, 5, 6, 7, (9*5)+1, (9*5)+2, (9*5)+3, (9*5)+4, (9*5)+5, (9*5)+6, (9*5)+7};
     private static final int BACK_BUTTON_SLOT = (9*5)+3;
@@ -49,7 +51,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
     private static final int CONFIRM_BUTTON_SLOT = (9*5)+5;
     private static final int TITLE_SLOT = 4;
 
-    //Mapping
+    // Mapping
     private record MapType(TagKey<Structure> tag, Holder<MapDecorationType> decoration) {}
     private static final Map<Item, MapType> MAP_TYPES = Map.of(
             Items.ABANDONED_CAMP_MAP,   new MapType(StructureTags.ABANDONED_CAMP,
@@ -80,7 +82,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         this.parent = parent;
 
         this.menuSettings = settings;
-        this.rewardSlot = rewards;
+        this.trades = rewards;
 
         this.setTitle(Component.literal("Reward Menu"));
         this.setupMainMenu();
@@ -89,29 +91,43 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
     // MENU DISPLAY //
 
     private void setupMainMenu() {
-        //Reward Section
+        // Reward Section
         rewardDisplay();
 
-        //Gray Border
+        // Gray Border
         for (int s : GREY_BORDER)
             this.setSlot(s,
                     new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
 
-        //Red Border
+        // Red Border
         for (int s : RED_BORDER)
             this.setSlot(s,
                     new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()).hideTooltip());
 
-        //Title
+        // Title
         this.setSlot(TITLE_SLOT, new GuiElementBuilder(Items.PAPER));//.setName(Component.literal(components)));
 
-        //Back Button
+        // Back Button
         this.setSlot(BACK_BUTTON_SLOT, new GuiElementBuilder(Items.ARROW).setName(Component.literal("Back")));
 
-        //Close Button
+        // Close Button
         this.setSlot(CLOSE_BUTTON_SLOT, new GuiElementBuilder(Items.BARRIER).setName(Component.literal("Close")));
 
         updateSettings();
+    }
+
+    private void rewardDisplay(){
+        for (int s = 0; s < trades.length; s++) {
+            Trade r = trades[s];
+
+            //Display
+            GuiElementBuilder element = r.guiElement()
+                .addLoreLine(Component.empty())
+                .addLoreLine(Component.literal("§eLeft Click to Exchange!"))
+                .addLoreLine(Component.literal("§eRight Click to Bulk Exchange!"));
+
+            this.setSlot(rewardSlot(s), element);
+        }
     }
 
     // CLICK ACTIONS //
@@ -141,7 +157,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         // Reward selection
         int slot = -1;
         // Find & check if the player selected a reward slot
-        for (int i = 0; i < rewardSlot.length; i++)
+        for (int i = 0; i < trades.length; i++)
             if (index == rewardSlot(i)) {
                 slot = i;
                 break;
@@ -154,6 +170,92 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
 
         return false;
     }
+
+    // REWARD PROCESSING //
+
+    public void rewardPreCheck(int slot, ClickType clickType) {
+        Trade trade = trades[slot];
+        Inventory inv = player.getInventory();
+
+        for(int i = 0; i < trade.offers().length; i++){
+            // Player currency count
+            int playerTradeItems = inv.countItem(trade.offer(i));
+            if (playerTradeItems <= 0)
+                return;
+
+
+            // Check if the player has enough currency for the given reward
+            if (playerTradeItems < trade.cost(i))
+                return;
+        }
+
+        if(clickType.isRight){
+            new BuyAmountGUI(player, menuSettings, trade, this).open();
+            return;
+        }
+
+        if(menuSettings.confirmation){
+            new ConfirmationGUI<>(player, trade.guiElement(), this, trade).open();
+            return;
+        }
+
+        // Otherwise continue as usual
+        this.confirm(true, trade);
+    }
+
+    public void confirm(boolean confirmed, Trade item) {
+        if (!isOpen()) {
+            updateSettings();
+            open();
+        }
+        if (!confirmed)
+            return;
+
+        // Process the transaction
+        processReward(player, item);
+    }
+
+    private void processReward(ServerPlayer player, Trade trade) {
+        Inventory inv = player.getInventory();
+
+        for (Offer o : trade.offers())
+            removeNItemsFromContainer(inv, o.item(), o.count());
+
+        for(int i = 0; i < trade.rewards().length; i++){
+            MapType type = MAP_TYPES.get(trade.item(i));
+            if (type != null) {
+                processMap(inv, type, trade.rewards()[i], trade.offers());
+                return;
+            }
+
+            giveToPlayer(player, inv, trade.stack(i));
+        }
+
+        GSServerMod.LOGGER.info(String.format(
+            "Traded with %s %s",
+            player.nameAndId().name(),
+            trade.getString()
+        ));
+    }
+
+    private void processMap(Inventory inv, MapType type, Reward reward, Offer[] offerings) {
+        int filledMapCount = 0;
+        int total = reward.count();
+        while (filledMapCount < total){
+            ItemStack map = fillMap(type, reward.item());
+            if (map == null) { // map type was not found around the player
+                GSServerMod.LOGGER.error("No structure found nearby for this map!");
+                player.sendSystemMessage(Component.literal("§cNo structure found nearby for this map of type " + type.tag().getTranslationKey() + " !"));
+                player.sendSystemMessage(Component.literal("§cPlease contact an admin for compensation."));
+
+                return;
+            }
+
+            giveToPlayer(player, inv, map);
+            filledMapCount++;
+        }
+    }
+
 
     // MISC //
 
@@ -174,50 +276,6 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
     protected void save_and_close() {
         player.setAttached(GSServerMod.SHOP_SETTINGS_ATTACHMENT, menuSettings);
         close();
-    }
-
-    public void rewardPreCheck(int slot, ClickType clickType) {
-        Trade trade = rewardSlot[slot];
-        Inventory inv = player.getInventory();
-
-        for(int i = 0; i < trade.offers().length; i++){
-            // Player currency count
-            int playerTradeItems = inv.countItem(trade.offer(i));
-            if (playerTradeItems <= 0) { // How did we get here...?
-                return;
-            }
-
-            // Check if the player has enough currency for the given reward
-            if (playerTradeItems < trade.cost(i)) {
-                return;
-            }
-        }
-
-        if(clickType.isRight){
-            new BuyAmountGUI(player, menuSettings, trade, this).open();
-            return;
-        }
-
-        if(menuSettings.confirmation){
-            new ConfirmationGUI<>(player, trade, this, trade).open();
-            return;
-        }
-
-        // Otherwise continue as usual
-        this.confirm(true, trade);
-    }
-
-    public void confirm(boolean confirmed, Trade item) {
-        if (!isOpen()) {
-            updateSettings();
-            open();
-        }
-        if (!confirmed)
-            return;
-
-        // Process the transaction
-        processReward(player, item);
-
     }
 
     private static void giveToPlayer(ServerPlayer player, Inventory inv, ItemStack stack) {
@@ -252,68 +310,14 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         return 10 + (slot % 7) + (slot / 7) * 9;
     }
 
-    private void processReward(ServerPlayer player, Trade reward) {
-        Inventory inv = player.getInventory();
-        for(int i = 0; i < reward.rewards().length; i++){
-            MapType type = MAP_TYPES.get(reward.item(i));
-            if (type != null) {
-                processMap(inv, type, reward);
-                return;
-            }
-
-            processSimpleReward(inv, reward);
-        }
-    }
-
-    private void processMap(Inventory inv, MapType type, Trade trade) {
-        int i = 0;
-        int cost = 0;
-        while (i < trade.rewards().length){
-            ItemStack map = fillMap(type, trade.item(i));
-            if (map == null) break; // map type was not found around the player
-
-            // Careful! possible unintended flooring?
-            // SHOULD be usable with maps and simple things as the ratio is 1-to-1
-            int partialCost = trade.cost(i) / trade.count(i);
-            cost += partialCost;
-            for(int j = 0; j < trade.offers().length; j++){
-                removeNItemsFromContainer(player.getInventory(), trade.offer(j), partialCost);
-            }
-            giveToPlayer(player, inv, map);
-            i++;
-        }
-        GSServerMod.LOGGER.info(String.format(
-            "Traded with %s %s",
-            player.nameAndId().name(),
-            new Trade().getString()
-        ));
-    }
-
-    private void processSimpleReward(Inventory inv, Trade trade) {
-        for(int j = 0; j < trade.offers().length; j++){
-            removeNItemsFromContainer(player.getInventory(), trade.offer(j), trade.cost(j));
-        }
-        for(int j = 0; j < trade.rewards().length; j++){
-            giveToPlayer(player, inv, trade.stack(j));
-        }
-        GSServerMod.LOGGER.info(String.format(
-            "Traded with %s %s",
-            player.nameAndId().name(),
-            trade.getString()
-        ));
-    }
 
     private ItemStack fillMap(MapType type, Item originalItem) {
-        // Maps
         ServerLevel level = player.level();
 
         BlockPos pos = level.findNearestMapStructure(type.tag(), player.blockPosition(), 100, true);
-
-        if (pos == null) {
-            GSServerMod.LOGGER.error("No structure found nearby for this map!");
-            player.sendSystemMessage(Component.literal("No structure found nearby for this map!"));
+        if (pos == null)
             return null;
-        }
+
         GSServerMod.LOGGER.debug("Generated structure map of type ", type);
 
         ItemStack map = originalItem.getDefaultInstance();
@@ -325,27 +329,4 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         return map;
     }
 
-    private void rewardDisplay(){
-        for (int s = 0; s < rewardSlot.length; s++) {
-            Trade r = rewardSlot[s];
-            //Fix suffix for 1x items
-            //String suffix = "s";
-            //if(rewards[s].cost() == 1) suffix = "";
-
-            //Display
-            ArrayList<Component> lore = r.defaultLore();
-
-            lore.add(Component.literal(""));
-            lore.add(Component.literal("§eLeft Click to Exchange!"));
-            lore.add(Component.literal("§eRight Click to Bulk Exchange!"));
-
-            Component name;
-            if(r.rewards().length == 1){
-                name = Component.literal("§l" + r.count(0) + "x §r" + r.item(0).getDefaultInstance().getHoverName().getString());
-            } else {
-                name = Component.literal("Reward Trade:");
-            }
-            this.setSlot(rewardSlot(s), new GuiElementBuilder(r.stack(0)).setName(name).setLore(lore));
-        }
-    }
 }

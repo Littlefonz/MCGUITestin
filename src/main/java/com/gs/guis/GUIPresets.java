@@ -1,7 +1,11 @@
 package com.gs.guis;
 
 import com.gs.Items.ModItems;
+
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -11,15 +15,9 @@ import java.util.ArrayList;
 public class GUIPresets {
 
     public record Offer(int count, Item item) {
-        public static Offer give(int count, Item offer) {
-            return new Offer(count, offer);
-        }
     }
 
     public record Reward(int count, Item item) {
-        public static Reward give(int count, Item item) {
-            return new Reward(count, item);
-        }
     }
 
     public record Trade(Offer[] offers, Reward[] rewards) {
@@ -41,67 +39,105 @@ public class GUIPresets {
             return new Trade(offerings, rewards);
         }
 
-
         public ItemStack stack(int index) {
             return new ItemStack(rewards[index].item, rewards[index].count);
         }
 
-        public Offer[] offers() {
-            return offers;
-        }
-
-        public Reward[] rewards() {
-            return rewards;
-        }
-
-        public Item item(int index) {
-            return rewards[index].item;
-        }
-
-        public int count(int index) {
-            return rewards[index].count;
-        }
-
-        public Item offer(int index) {
-            return offers[index].item;
-        }
-
-        public int cost(int index) {
-            return offers[index].count;
-        }
+        public Item item(int index) { return rewards[index].item; }
+        public int count(int index) { return rewards[index].count; }
+        public Item offer(int index) { return offers[index].item; }
+        public int cost(int index) { return offers[index].count; }
 
         public String getString() {
-            StringBuilder string = new StringBuilder();
-            for (Offer offer : offers) {
-                string.append(offer.item.getDefaultInstance().getHoverName().getString()).append(", ").append(offer.count);
+            StringBuilder offerstr = new StringBuilder();
+            StringBuilder rewardstr = new StringBuilder();
+            if (offers != null) for (Offer offer : offers) {
+                offerstr.append(offer.item.getDefaultInstance().getHoverName().getString()).append("x").append(offer.count).append(", ");
             }
-            for (Reward reward : rewards) {
-                string.append(reward.item.getDefaultInstance().getHoverName().getString()).append(", ").append(reward.count);
+            if (rewards != null) for (Reward reward : rewards) {
+                rewardstr.append(reward.item.getDefaultInstance().getHoverName().getString()).append("x").append(reward.count).append(", ");
             }
 
-            return string.toString();
+            return String.format(
+                "[%s] -> [%s]",
+                offerstr.substring(0, Math.max(offerstr.length() - 2, 0)),
+                rewardstr.substring(0, Math.max(rewardstr.length() - 2, 0))
+            );
         }
 
-        public ArrayList<Component> defaultLore(){return defaultLore(0);}
+        public int getAffordableCount(ServerPlayer player) {
+            Inventory inv = player.getInventory();
+            int[] userCount = new int[offers.length];
+            for (int i = 0; i < userCount.length; i++) {
+                userCount[i] = inv.countItem(offers[i].item);
+            }
+
+            int multiplier = 0;
+            boolean affordable = true;
+            while (affordable) {
+                for (int i = 0; i < offers.length; i++) {
+                    if (userCount[i] < offers[i].count * multiplier) {
+                        affordable = false;
+                        break;
+                    }
+                }
+                if (affordable) multiplier++;
+            }
+            return multiplier;
+        }
+
+        public Trade multiply(int multiplier) {
+            Offer[] newOffers = new Offer[offers.length];
+            Reward[] newRewards = new Reward[rewards.length];
+
+            for (int i = 0; i < offers.length; i++) {
+                newOffers[i] = new Offer(offers[i].count * multiplier, offers[i].item);
+            }
+            for (int i = 0; i < rewards.length; i++) {
+                newRewards[i] = new Reward(rewards[i].count * multiplier, rewards[i].item);
+            }
+
+            return new Trade(newOffers, newRewards);
+        }
+
+        public ArrayList<Component> defaultLore() { return defaultLore(0); }
 
 
-        public ArrayList<Component> defaultLore(int multiplier){
+        public ArrayList<Component> defaultLore(int multiplier) {
             ArrayList<Component> lore = new ArrayList<>();
 
-
-            if (rewards.length > 1)
+            if (rewards.length != 1)
                 for (Reward reward : rewards)
-                    lore.add(Component.literal("§l" + reward.count * Math.powExact(2, multiplier) + "x §r" + reward.item.getDefaultInstance().getHoverName().getString()));
+                    lore.add(Component.literal("§l" + reward.count * multiplier + "x §r" + reward.item.getDefaultInstance().getHoverName().getString()));
 
-
-            lore.add(Component.literal(""));
+            lore.add(Component.empty());
             lore.add(Component.literal("Cost:"));
 
             for (Offer offer : offers)
-                lore.add(Component.literal("§l" + offer.count * Math.powExact(2, multiplier) + "x §r" + offer.item.getDefaultInstance().getHoverName().getString()));
-
+                lore.add(Component.literal("§l" + offer.count * multiplier + "x §r" + offer.item.getDefaultInstance().getHoverName().getString()));
 
             return lore;
+        }
+
+        public Component title(int multiplier) {
+            StringBuilder title = new StringBuilder();
+            for (Reward reward : rewards)
+                title
+                    .append("§l")
+                    .append(reward.count * multiplier)
+                    .append("x §r")
+                    .append(reward.item.getDefaultInstance().getHoverName().getString())
+                    .append(", ");
+
+            return Component.literal(title.substring(0, title.length() - 2));
+        }
+
+        public GuiElementBuilder guiElement() { return guiElement(1); }
+        public GuiElementBuilder guiElement(int multiplier) {
+            return new GuiElementBuilder(stack(0))
+                .setCount(rewards[0].count * Math.max(multiplier, 1))
+                .setName(title(multiplier))
+                .setLore(defaultLore(multiplier));
         }
     }
 
@@ -151,7 +187,7 @@ public class GUIPresets {
     public static final Trade[] CUSTOM_REWARDS = {
         Trade.get(1, ModItems.WHEEL_TOKEN).from(1, ModItems.PRIZE_TICKET),
         Trade.get(1, ModItems.ARTIFACT_VOUCHER).from(5, ModItems.PRIZE_TICKET),
-        Trade.get(1, ModItems.ASPECT_OF_THE_VOID).from(new Offer[]{Offer.give(1, Items.DIAMOND_SWORD), new Offer(512, Items.ENDER_EYE)})
+        Trade.get(1, ModItems.ASPECT_OF_THE_VOID).from(new Offer[]{new Offer(1, Items.DIAMOND_SWORD), new Offer(512, Items.ENDER_EYE)})
     };
 
     //Vanilla GUI Components
