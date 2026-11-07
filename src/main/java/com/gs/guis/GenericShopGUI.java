@@ -225,7 +225,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
             MapType type = MAP_TYPES.get(trade.item(i));
             if (type != null) {
                 processMap(inv, type, trade.rewards()[i], trade.offers());
-                return;
+                continue;
             }
 
             giveToPlayer(player, inv, trade.stack(i));
