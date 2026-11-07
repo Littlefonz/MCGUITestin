@@ -9,7 +9,7 @@ import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 
-import com.gs.guis.GUIPresets.Reward;
+import com.gs.guis.GUIPresets.Trade;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
@@ -18,7 +18,7 @@ import eu.pb4.sgui.api.gui.SimpleGui;
 
 public class GenericShowcaseGUI extends SimpleGui {
     //Displays
-    Reward[] display;
+    Trade[] display;
     Component[] components;
 
     //UI Locations
@@ -26,7 +26,7 @@ public class GenericShowcaseGUI extends SimpleGui {
     private static final int CLOSE_BUTTON_SLOT = (9*3)+4;
 
     // GUI Setup
-    public GenericShowcaseGUI(ServerPlayer player, Reward[] display, Component[] components) {
+    public GenericShowcaseGUI(ServerPlayer player, Trade[] display, Component[] components) {
         super(MenuType.GENERIC_9x4, player, false);
 
         this.display = display;
@@ -59,8 +59,8 @@ public class GenericShowcaseGUI extends SimpleGui {
             lore.add(Component.literal(""));
             lore.add(components[s]);
 
-            ItemStack stack = display[s].stack();
-            Component name = Component.literal("§6" + display[s].count() + "x " + stack.getHoverName().getString());
+            ItemStack stack = display[s].stack(0);
+            Component name = Component.literal("§6" + display[s].count(0) + "x " + stack.getHoverName().getString());
             this.setSlot(displaySlot(s), new GuiElementBuilder(stack).setName(name).setLore(lore));
         }
     }

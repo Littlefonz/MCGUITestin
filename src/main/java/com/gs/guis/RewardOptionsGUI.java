@@ -34,8 +34,8 @@ public class RewardOptionsGUI extends SimpleGui {
     private static final int[] CUSTOM_SLOTS = { 11, 15 };
     private static final int CLOSE_BUTTON_SLOT = (9*2)+4;
 
-    public static String[] COMPONENTS = { "§9§lCustom Rewards", "§2§lVanilla Rewards" };
-    public static Item[] COMPONENT_MODELS = { Items.SUNFLOWER, Items.GOLDEN_CARROT };
+    public String[] COMPONENTS = { "§9§lCustom Rewards", "§2§lVanilla Rewards" };
+    public Item[] COMPONENT_MODELS = { Items.SUNFLOWER, Items.GOLDEN_CARROT };
 
     private void setupMainMenu() {
         // Background Setup
@@ -70,10 +70,10 @@ public class RewardOptionsGUI extends SimpleGui {
 
         GenericShopGUI g;
         if (index == CUSTOM_SLOTS[0]){
-            g = new GenericShopGUI(this, player, settings, CUSTOM_REWARDS, COMPONENT_MODELS[0], COMPONENTS[0]);
+            g = new GenericShopGUI(this, player, settings, CUSTOM_REWARDS);
             g.open();
         } else if (index == CUSTOM_SLOTS[1]){
-            g = new GenericShopGUI(this, player, settings, VANILLA_REWARDS, COMPONENT_MODELS[1], COMPONENTS[1]);
+            g = new GenericShopGUI(this, player, settings, VANILLA_REWARDS);
             g.open();
         }
 

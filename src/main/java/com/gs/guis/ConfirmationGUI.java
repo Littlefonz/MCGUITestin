@@ -6,7 +6,7 @@ import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Items;
 
-import com.gs.guis.GUIPresets.Reward;
+import com.gs.guis.GUIPresets.Trade;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
@@ -19,11 +19,11 @@ interface Confirmable<T> {
 
 public class ConfirmationGUI<T> extends SimpleGui {
 
-    Reward reward;
+    Trade reward;
     T item;
     Confirmable<T> conf;
 
-    public ConfirmationGUI(ServerPlayer player, Reward reward, Confirmable<T> g, T item){
+    public ConfirmationGUI(ServerPlayer player, Trade reward, Confirmable<T> g, T item){
         super(MenuType.GENERIC_9x3, player, false);
         this.setTitle(Component.literal("Exchange for this item?"));
 
@@ -46,8 +46,8 @@ public class ConfirmationGUI<T> extends SimpleGui {
         }
 
         this.setSlot(DENY, new GuiElementBuilder(Items.CONCRETE.red()).setName(Component.literal("Deny")));
-        Component name = Component.literal("§l" + reward.count() + "x §r" + reward.item().getDefaultInstance().getHoverName().getString());
-        this.setSlot(ITEM, new GuiElementBuilder(reward.stack()).setName(name));
+        Component name = Component.literal("§l" + reward.count(0) + "x §r" + reward.item(0).getDefaultInstance().getHoverName().getString());
+        this.setSlot(ITEM, new GuiElementBuilder(reward.stack(0)).setName(name));
         this.setSlot(CONFIRM, new GuiElementBuilder(Items.CONCRETE.green()).setName(Component.literal("Confirm")));
     }
 

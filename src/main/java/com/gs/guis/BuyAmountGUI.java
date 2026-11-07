@@ -2,7 +2,7 @@ package com.gs.guis;
 
 import com.gs.GSServerMod;
 import com.gs.Items.ModItems;
-import com.gs.guis.GUIPresets.Reward;
+import com.gs.guis.GUIPresets.Trade;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,8 +22,7 @@ public class BuyAmountGUI extends SimpleGui {
 
     ShopSettings settings;
 
-    Reward origReward;
-    Reward[] rewards;
+    Trade origReward;
     GenericShopGUI g;
 
     private static final int BACK_BUTTON_SLOT = 21;
@@ -33,14 +32,13 @@ public class BuyAmountGUI extends SimpleGui {
     private static final int[] BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8 };
     private static final int[] BUY_SLOTS = { 11, 12, 13, 14, 15 };
 
-    public BuyAmountGUI(ServerPlayer player, ShopSettings settings, Reward r, int costCount, GenericShopGUI g){
+    public BuyAmountGUI(ServerPlayer player, ShopSettings settings, Trade r, GenericShopGUI g){
         super(MenuType.GENERIC_9x3, player, false);
         this.setTitle(Component.literal("Select Buy Amount"));
 
         this.settings = settings;
         this.g = g;
         this.origReward = r;
-        this.rewards = getRewards(r, costCount);
 
         setupMainMenu();
     }
@@ -59,22 +57,22 @@ public class BuyAmountGUI extends SimpleGui {
         }
     }
 
-    private Reward[] getRewards(Reward reward, int budget) {
-        int CAPACITY = 5; // number of possible rewards
-
-        Reward[] rewards = new Reward[5];
-
-        for (int i = 0; i < CAPACITY; i++) {
-            int multiplier = (int) Math.pow(2, i + 1);
-            int newCount = reward.count() * multiplier;
-            int newCost = reward.cost() * multiplier;
-            if (budget < newCost)
-                break;
-
-            rewards[i] = new Reward(newCount, reward.item(), newCost, reward.offer());
-        }
-        return rewards;
-    }
+//    private Trade[] getRewards(Trade reward, int budget) {
+//        int CAPACITY = 5; // number of possible rewards
+//
+//        Trade[] rewards = new Trade[5];
+//
+//        for (int i = 0; i < CAPACITY; i++) {
+//            int multiplier = (int) Math.pow(2, i + 1);
+//            int newCount = reward.count(i) * multiplier;
+//            int newCost = reward.cost(i) * multiplier;
+//            if (budget < newCost)
+//                break;
+//
+//            rewards[i] = new Trade(newCount, reward.item(i), newCost, reward.offer(i));
+//        }
+//        return rewards;
+//    }
 
     private void setupMainMenu() {
         //Background Setup
@@ -90,25 +88,24 @@ public class BuyAmountGUI extends SimpleGui {
 
         //Buy Slots
         for (int i = 0; i < BUY_SLOTS.length; i++) {
-            Reward r = rewards[i];
+            Trade r = origReward;
 
             int s = BUY_SLOTS[i];
 
-            ArrayList<Component> lore = new ArrayList<>();
+            ArrayList<Component> lore = r.defaultLore();
             if (r != null) {
-                lore.add(Component.literal("§7Cost: " + r.cost() + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + "s"));
                 lore.add(Component.literal(""));
                 lore.add(Component.literal("§eClick to Buy!"));
-                Component name = Component.literal("§l" + r.count() + "x §r" + r.item().getDefaultInstance().getHoverName().getString());
-                this.setSlot(s, new GuiElementBuilder(r.stack()).setName(name).setLore(lore));
+                Component name = Component.literal("§l" + r.count(0) + "x §r" + r.item(0).getDefaultInstance().getHoverName().getString());
+                this.setSlot(s, new GuiElementBuilder(r.stack(0)).setName(name).setLore(lore));
             } else {
-                int cost = origReward.cost() * (int) Math.pow(2, i + 1);
-                int count = origReward.count() * (int) Math.pow(2, i + 1);
+                int cost = origReward.cost(0) * (int) Math.pow(2, i + 1);
+                int count = origReward.count(0) * (int) Math.pow(2, i + 1);
                 lore.add(Component.literal("§cCost: " + cost + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + "s"));
                 lore.add(Component.literal(""));
                 lore.add(Component.literal("§4Not enough " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + "s!"));
-                Component name = Component.literal("§l" + count + "x §r" + origReward.item().getDefaultInstance().getHoverName().getString());
-                ItemStack stack = origReward.stack();
+                Component name = Component.literal("§l" + count + "x §r" + origReward.item(0).getDefaultInstance().getHoverName().getString());
+                ItemStack stack = origReward.stack(0);
                 stack.setCount(1);
                 this.setSlot(s, new GuiElementBuilder(stack).setName(name).setLore(lore));
             }
@@ -167,7 +164,7 @@ public class BuyAmountGUI extends SimpleGui {
             int s = BUY_SLOTS[i];
 
             if (index == s) {
-                Reward r = rewards[i];
+                Trade r = origReward;
                 if (r == null) // Selected reward is not available; they do not have enough to purchase
                     break;
 
