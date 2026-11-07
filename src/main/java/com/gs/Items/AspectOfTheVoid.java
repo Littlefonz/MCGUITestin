@@ -1,16 +1,28 @@
 package com.gs.Items;
 
+import static com.gs.guis.GUIPresets.VOUCHER_REWARDS;
+
+import com.gs.guis.GUIPresets;
+import com.gs.guis.GenericShowcaseGUI;
+
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.world.phys.Vec3;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -18,12 +30,24 @@ import java.util.function.Consumer;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
+import eu.pb4.sgui.api.gui.SimpleGui;
 
 public class AspectOfTheVoid extends Item implements PolymerItem {
     public AspectOfTheVoid(Item.Properties properties) {
         super(properties);
     }
 
+
+    @Override
+    public InteractionResult use(Level level, Player user, InteractionHand hand) {
+        // Open GUI
+        if (user instanceof ServerPlayer serverPlayerEntity) {
+            //if(user.getInventory())
+            user.teleport(new TeleportTransition(level.getServer().getLevel(level.dimension()), new Vec3(user.getX() + 8, user.getY(), user.getZ()), new Vec3(0,0,0), serverPlayerEntity.getYRot(), serverPlayerEntity.getXRot(), TeleportTransition.PLAY_PORTAL_SOUND));
+        }
+
+        return InteractionResult.SUCCESS;
+    }
 
     @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext context) {

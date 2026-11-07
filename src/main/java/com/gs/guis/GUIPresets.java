@@ -82,31 +82,24 @@ public class GUIPresets {
             return string.toString();
         }
 
-        public ArrayList<Component> defaultLore(){return defaultLore(false);}
+        public ArrayList<Component> defaultLore(){return defaultLore(0);}
 
-        public ArrayList<Component> defaultLore(boolean multiplier){
+
+        public ArrayList<Component> defaultLore(int multiplier){
             ArrayList<Component> lore = new ArrayList<>();
 
-            int temp = 0;
-            if(multiplier)
-                temp = 1;
 
-            if(rewards.length > 1)
-                for (Reward reward : rewards){
-                    temp *= 2;
-                    lore.add(Component.literal("§l" + reward.count * temp + "x §r" + reward.item.getDefaultInstance().getHoverName().getString()));
-                }
+            if (rewards.length > 1)
+                for (Reward reward : rewards)
+                    lore.add(Component.literal("§l" + reward.count * Math.powExact(2, multiplier) + "x §r" + reward.item.getDefaultInstance().getHoverName().getString()));
+
 
             lore.add(Component.literal(""));
             lore.add(Component.literal("Cost:"));
 
-            if(multiplier)
-                temp = 1;
+            for (Offer offer : offers)
+                lore.add(Component.literal("§l" + offer.count * Math.powExact(2, multiplier) + "x §r" + offer.item.getDefaultInstance().getHoverName().getString()));
 
-            for (Offer offer : offers) {
-                temp *= 2;
-                lore.add(Component.literal("§l" + offer.count * temp + "x §r" + offer.item.getDefaultInstance().getHoverName().getString()));
-            }
 
             return lore;
         }

@@ -92,23 +92,12 @@ public class BuyAmountGUI extends SimpleGui {
 
             int s = BUY_SLOTS[i];
 
-            ArrayList<Component> lore = r.defaultLore();
-            if (r != null) {
-                lore.add(Component.literal(""));
-                lore.add(Component.literal("§eClick to Buy!"));
-                Component name = Component.literal("§l" + r.count(0) + "x §r" + r.item(0).getDefaultInstance().getHoverName().getString());
-                this.setSlot(s, new GuiElementBuilder(r.stack(0)).setName(name).setLore(lore));
-            } else {
-                int cost = origReward.cost(0) * (int) Math.pow(2, i + 1);
-                int count = origReward.count(0) * (int) Math.pow(2, i + 1);
-                lore.add(Component.literal("§cCost: " + cost + " " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + "s"));
-                lore.add(Component.literal(""));
-                lore.add(Component.literal("§4Not enough " + ModItems.PRIZE_TICKET.getDefaultInstance().getHoverName().getString() + "s!"));
-                Component name = Component.literal("§l" + count + "x §r" + origReward.item(0).getDefaultInstance().getHoverName().getString());
-                ItemStack stack = origReward.stack(0);
-                stack.setCount(1);
-                this.setSlot(s, new GuiElementBuilder(stack).setName(name).setLore(lore));
-            }
+            ArrayList<Component> lore = r.defaultLore(i+1);
+            lore.add(Component.literal(""));
+            lore.add(Component.literal("§eClick to Buy!"));
+
+            Component name = Component.literal("§l" + r.count(0) * Math.powExact(2, i+1) + "x §r" + r.item(0).getDefaultInstance().getHoverName().getString());
+            this.setSlot(s, new GuiElementBuilder(r.stack(0)).setName(name).setLore(lore));
 
         }
 

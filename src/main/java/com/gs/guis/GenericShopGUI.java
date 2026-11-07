@@ -340,7 +340,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
             lore.add(Component.literal("§eRight Click to Bulk Exchange!"));
 
             Component name;
-            if(r.offers().length == 1){
+            if(r.rewards().length == 1){
                 name = Component.literal("§l" + r.count(0) + "x §r" + r.item(0).getDefaultInstance().getHoverName().getString());
             } else {
                 name = Component.literal("Reward Trade:");
