@@ -13,10 +13,13 @@
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/gs-server-mod/icon.png",
-	"environment": "server",
+	"environment": "*",
 	"entrypoints": {
 		"main": [
 			"com.gs.GSServerMod"
+		],
+		"fabric-datagen": [
+		    "com.gs.GSDataGen"
 		]
 	},
 	"mixins": [],
