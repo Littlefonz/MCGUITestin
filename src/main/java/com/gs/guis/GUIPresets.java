@@ -54,7 +54,7 @@ public class GUIPresets {
     public static final Trade[] CUSTOM_REWARDS = {
         Trade.get(1, ModItems.WHEEL_TOKEN).from(1, ModItems.PRIZE_TICKET),
         Trade.get(1, ModItems.ARTIFACT_VOUCHER).from(5, ModItems.PRIZE_TICKET),
-        Trade.get(1, ModItems.ASPECT_OF_THE_VOID).from(new Offer[]{new Offer(1, Items.DIAMOND_SWORD), new Offer(512, Items.ENDER_EYE)})
+        Trade.get(1, ModItems.ASPECT_OF_THE_VOID).from(new Offer[]{new Offer(1, Items.DIAMOND_SPEAR), new Offer(1, Items.ENCHANTED_BOOK), new Offer(512, Items.ENDER_EYE)})
     };
 
     //Vanilla GUI Components
