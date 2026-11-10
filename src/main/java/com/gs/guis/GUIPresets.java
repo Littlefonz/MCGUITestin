@@ -20,14 +20,14 @@ public class GUIPresets {
         Trade.get(1, ModItems.RUSTED_CROWN),
     };
     public static final Component[] WHEEL_ITEM_CHANCES = {
-        Component.literal("§724.4% Chance (25 Weight)"),
-        Component.literal("§719.5% Chance (20 Weight)"),
-        Component.literal("§714.6% Chance (15 Weight)"),
-        Component.literal("§714.6% Chance (15 Weight)"),
-        Component.literal("§79.7% Chance (10 Weight)"),
-        Component.literal("§79.7% Chance (10 Weight)"),
-        Component.literal("§75.8% Chance (6 Weight)"),
-        Component.literal("§71.6% Chance (1.6 Weight)"),
+        Component.literal("§724.4% Chance"), // 25 Weight
+        Component.literal("§719.5% Chance"), // 20 Weight
+        Component.literal("§714.6% Chance"), // 15 Weight
+        Component.literal("§714.6% Chance"), // 15 Weight
+        Component.literal("§79.7% Chance"), // 10 Weight
+        Component.literal("§79.7% Chance"), // 10 Weight
+        Component.literal("§75.8% Chance"), // 6 Weight
+        Component.literal("§71.6% Chance"), // 1.6 Weight
     };
 
     //Voucher Components
