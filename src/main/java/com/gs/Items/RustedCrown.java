@@ -14,6 +14,9 @@ import net.minecraft.world.item.component.TooltipDisplay;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.gs.GSUtils;
+
+import java.util.List;
 import java.util.function.Consumer;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
@@ -46,9 +49,7 @@ public class RustedCrown extends Item implements PolymerItem{
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> textConsumer, TooltipFlag type) {
-        textConsumer.accept(Component.translatable("item.gs-server-mod.rusted_crown.info").withStyle(ChatFormatting.GOLD));
-
-        super.appendHoverText(stack, context, displayComponent, textConsumer, type);
+    public void modifyClientTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {
+        tooltip.addAll(GSUtils.infoComponents.apply("rusted_crown"));
     }
 }

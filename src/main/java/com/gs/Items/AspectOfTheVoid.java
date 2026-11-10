@@ -28,6 +28,9 @@ import net.minecraft.world.phys.Vec3;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.gs.GSUtils;
+
+import java.util.List;
 import java.util.function.Consumer;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
@@ -126,18 +129,7 @@ public class AspectOfTheVoid extends Item implements PolymerItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> textConsumer, TooltipFlag type) {
-        textConsumer.accept(Component.translatable("item.gs-server-mod.aspect_of_the_void.info_1").withStyle(ChatFormatting.DARK_GRAY));
-        textConsumer.accept(Component.translatable("item.gs-server-mod.aspect_of_the_void.info_2").withStyle(ChatFormatting.STRIKETHROUGH));
-        textConsumer.accept(Component.translatable("item.gs-server-mod.aspect_of_the_void.info_3").withStyle(ChatFormatting.GOLD));
-        textConsumer.accept(Component.translatable("item.gs-server-mod.aspect_of_the_void.info_4").withStyle(ChatFormatting.YELLOW));
-        textConsumer.accept(Component.translatable("item.gs-server-mod.aspect_of_the_void.info_5").withStyle(ChatFormatting.STRIKETHROUGH));
-        textConsumer.accept(Component.translatable("item.gs-server-mod.aspect_of_the_void.info_6").withStyle(ChatFormatting.GOLD));
-        textConsumer.accept(Component.translatable("item.gs-server-mod.aspect_of_the_void.info_7").withStyle(ChatFormatting.YELLOW));
-        textConsumer.accept(Component.translatable("item.gs-server-mod.aspect_of_the_void.info_8").withStyle(ChatFormatting.STRIKETHROUGH));
-        textConsumer.accept(Component.translatable("item.gs-server-mod.aspect_of_the_void.info_9").withStyle(ChatFormatting.GRAY));
-        textConsumer.accept(Component.translatable("item.gs-server-mod.aspect_of_the_void.info_10").withStyle(ChatFormatting.GRAY));
-
-        super.appendHoverText(stack, context, displayComponent, textConsumer, type);
+    public void modifyClientTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {
+        tooltip.addAll(GSUtils.infoComponents.apply("aspect_of_the_void"));
     }
 }
