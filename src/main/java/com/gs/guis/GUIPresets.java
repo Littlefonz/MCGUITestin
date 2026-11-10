@@ -1,10 +1,14 @@
 package com.gs.guis;
 
+import com.gs.Items.ArtifactVoucher;
 import com.gs.Items.ModItems;
+import com.gs.Items.ArtifactVoucher.RarityComponent;
 import com.gs.Trades.Offer;
+import com.gs.Trades.Reward;
 import com.gs.Trades.Trade;
+
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
 
@@ -43,11 +47,11 @@ public class GUIPresets {
         Component.literal(
             "§7Chances of §8Common, §9Rare, §5Epic, §6Legendary, §7and §dMythic §7Artifacts"
         ),
-        Component.literal("§745% Chance §8(45 Weight)"),
-        Component.literal("§730% Chance §9(30 Weight)"),
-        Component.literal("§715% Chance §5(15 Weight)"),
-        Component.literal("§79% Chance §6(9 Weight)"),
-        Component.literal("§71% Chance §d(1 Weight)"),
+        Component.literal("§745% Chance"), // 45 Weight
+        Component.literal("§730% Chance"), // 30 Weight
+        Component.literal("§715% Chance"), // 15 Weight
+        Component.literal("§79% Chance"), // 9 Weight
+        Component.literal("§71% Chance"), // 1 Weight
     };
 
     // Prize ticket rewards
@@ -84,7 +88,43 @@ public class GUIPresets {
     // Item exchange
 
     public static final Trade[] CUSTOM_EXCHANGES = {
-        Trade.get(1, ModItems.ASTRO_COIN).from(22, Items.DIAMOND),
-        Trade.get(1, ModItems.ENERGY_CUBE).from(50, Items.DIAMOND)
+            Trade.get(1, ModItems.ASTRO_COIN).from(22, Items.DIAMOND),
+            Trade.get(1, ModItems.ENERGY_CUBE).from(50, Items.DIAMOND),
+
+            // Artifact voucher with guaranteed rare status
+            Trade.get(
+                    new Reward(1, ModItems.ARTIFACT_VOUCHER, DataComponentPatch
+                            .builder()
+                            .set(ArtifactVoucher.VOUCHER_RARITY,
+                                    RarityComponent.RARE)
+                            .build()))
+                    .from(2, ModItems.ARTIFACT_VOUCHER),
+
+            // Artifact voucher with guaranteed epic status
+            Trade.get(
+                    new Reward(1, ModItems.ARTIFACT_VOUCHER, DataComponentPatch
+                            .builder()
+                            .set(ArtifactVoucher.VOUCHER_RARITY,
+                                    RarityComponent.EPIC)
+                            .build()))
+                    .from(6, ModItems.ARTIFACT_VOUCHER),
+
+            // Artifact voucher with guaranteed legendary status
+            Trade.get(
+                    new Reward(1, ModItems.ARTIFACT_VOUCHER, DataComponentPatch
+                            .builder()
+                            .set(ArtifactVoucher.VOUCHER_RARITY,
+                                    RarityComponent.LEGENDARY)
+                            .build()))
+                    .from(15, ModItems.ARTIFACT_VOUCHER),
+
+            // Artifact voucher with guaranteed mythical status
+            Trade.get(
+                    new Reward(1, ModItems.ARTIFACT_VOUCHER, DataComponentPatch
+                            .builder()
+                            .set(ArtifactVoucher.VOUCHER_RARITY,
+                                    RarityComponent.MYTHICAL)
+                            .build()))
+                    .from(75, ModItems.ARTIFACT_VOUCHER),
     };
 }

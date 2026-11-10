@@ -2,6 +2,8 @@ package com.gs;
 
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import java.util.ArrayList;
+
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,21 +15,44 @@ public class Trades {
     public Trades() {
 	}
 
-	public record Offer(int count, Item item) {}
+	public record Offer(int count, Item item) {
 
-    public record Reward(int count, Item item) {}
+
+	}
+
+    public record Reward(int count, Item item, DataComponentPatch patch) {
+        public Reward(int count, Item item) {
+            this(count, item, DataComponentPatch.EMPTY);
+        }
+
+        public ItemStack stack() {
+            ItemStack stack = new ItemStack(item, count);
+            stack.applyComponents(patch);
+            return stack;
+        }
+
+
+    }
 
     public record Trade(Offer[] offers, Reward[] rewards) {
         public Trade() {
             this(null, null);
         }
 
+        public static Trade get(Reward reward) {
+            return new Trade(null, new Reward[] { reward });
+
+        }
         public static Trade get(int count, Item item) {
             return new Trade(null, new Reward[] { new Reward(count, item) });
         }
 
         public static Trade get(Reward[] rewards) {
             return new Trade(null, rewards);
+        }
+
+        public Trade from(Offer offer) {
+            return new Trade(new Offer[] { offer }, rewards);
         }
 
         public Trade from(int price, Item item) {
@@ -39,7 +64,7 @@ public class Trades {
         }
 
         public ItemStack stack(int index) {
-            return new ItemStack(rewards[index].item, rewards[index].count);
+            return rewards[index].stack();
         }
 
         public Item item(int index) {

@@ -221,14 +221,14 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         for (Offer o : trade.offers())
             removeNItemsFromContainer(inv, o.item(), o.count());
 
-        for(int i = 0; i < trade.rewards().length; i++){
-            MapType type = MAP_TYPES.get(trade.item(i));
+        for (Reward r : trade.rewards()) {
+            MapType type = MAP_TYPES.get(r.item());
             if (type != null) {
-                processMap(inv, type, trade.rewards()[i], trade.offers());
+                processMap(inv, type, r, trade.offers());
                 continue;
             }
 
-            giveToPlayer(player, inv, trade.stack(i));
+            giveToPlayer(player, inv, r.stack());
         }
 
         GSServerMod.LOGGER.info(String.format(
