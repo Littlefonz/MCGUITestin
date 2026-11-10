@@ -4,11 +4,12 @@ import com.gs.Items.ModItems;
 import com.gs.Trades.Offer;
 import com.gs.Trades.Trade;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
 
 public class GUIPresets {
-    //Wheel Item Components
+    // Gambling
     public static final Trade[] WHEEL_REWARDS = {
         Trade.get(12, Items.GOLD_BLOCK),
         Trade.get(10, Items.DIAMOND),
@@ -30,7 +31,6 @@ public class GUIPresets {
         Component.literal("§71.6% Chance"), // 1.6 Weight
     };
 
-    //Voucher Components
     public static final Trade[] VOUCHER_REWARDS = {
         Trade.get(1, Items.OAK_SIGN),
         Trade.get(1, Items.PAPER),
@@ -50,14 +50,14 @@ public class GUIPresets {
         Component.literal("§71% Chance §d(1 Weight)"),
     };
 
-    //Custom GUI Components
+    // Prize ticket rewards
+
     public static final Trade[] CUSTOM_REWARDS = {
         Trade.get(1, ModItems.WHEEL_TOKEN).from(1, ModItems.PRIZE_TICKET),
         Trade.get(1, ModItems.ARTIFACT_VOUCHER).from(5, ModItems.PRIZE_TICKET),
         Trade.get(1, ModItems.ASPECT_OF_THE_VOID).from(new Offer[]{new Offer(1, Items.DIAMOND_SPEAR), new Offer(1, Items.ENCHANTED_BOOK), new Offer(512, Items.ENDER_EYE)})
     };
 
-    //Vanilla GUI Components
     public static final Trade[] VANILLA_REWARDS = {
         Trade.get(8, Items.STRAW_BED)                .from(1, ModItems.PRIZE_TICKET),
         Trade.get(8, Items.GOLDEN_APPLE)             .from(1, ModItems.PRIZE_TICKET),
@@ -79,5 +79,12 @@ public class GUIPresets {
         Trade.get(1, Items.BURIED_TRIAL_CHAMBERS_MAP).from(3, ModItems.PRIZE_TICKET),
         Trade.get(1, Items.BURIED_ANCIENT_CITY_MAP)  .from(3, ModItems.PRIZE_TICKET),
         Trade.get(1, Items.TOTEM_OF_UNDYING)         .from(3, ModItems.PRIZE_TICKET)
+    };
+
+    // Item exchange
+
+    public static final Trade[] CUSTOM_EXCHANGES = {
+        Trade.get(1, ModItems.ASTRO_COIN).from(22, Items.DIAMOND),
+        Trade.get(1, ModItems.ENERGY_CUBE).from(50, Items.DIAMOND)
     };
 }

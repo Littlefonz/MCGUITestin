@@ -1,6 +1,7 @@
 package com.gs.guis;
 
 
+import static com.gs.guis.GUIPresets.CUSTOM_EXCHANGES;
 import static com.gs.guis.GUIPresets.CUSTOM_REWARDS;
 import static com.gs.guis.GUIPresets.VANILLA_REWARDS;
 
@@ -22,7 +23,7 @@ public class RewardOptionsGUI extends SimpleGui {
     ShopSettings settings;
 
     public RewardOptionsGUI(ServerPlayer player) {
-        super(MenuType.GENERIC_9x3, player, false);
+        super(MenuType.GENERIC_9x4, player, false);
 
         settings = player.getAttachedOrSet(GSServerMod.SHOP_SETTINGS_ATTACHMENT, new ShopSettings());
 
@@ -30,16 +31,16 @@ public class RewardOptionsGUI extends SimpleGui {
         this.setupMainMenu();
     }
 
-    private static final int[] BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8 };
-    private static final int[] CUSTOM_SLOTS = { 11, 15 };
-    private static final int CLOSE_BUTTON_SLOT = (9*2)+4;
+    private static final int[] BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8 };
+    private static final int[] CUSTOM_SLOTS = { 11, 15, 20 };
+    private static final int CLOSE_BUTTON_SLOT = (9*3)+4;
 
-    public String[] COMPONENTS = { "§9§lCustom Rewards", "§2§lVanilla Rewards" };
-    public Item[] COMPONENT_MODELS = { Items.SUNFLOWER, Items.GOLDEN_CARROT };
+    public String[] COMPONENTS = { "§9§lCustom Rewards", "§2§lVanilla Rewards", "§9§lCustom Item Exchange" };
+    public Item[] COMPONENT_MODELS = { Items.SUNFLOWER, Items.GOLDEN_CARROT, Items.BUNDLE };
 
     private void setupMainMenu() {
         // Background Setup
-        for (int s = 0; s < 27; s++){
+        for (int s = 0; s < this.size; s++){
             this.setSlot(s,
                     new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
         }
@@ -74,6 +75,9 @@ public class RewardOptionsGUI extends SimpleGui {
             g.open();
         } else if (index == CUSTOM_SLOTS[1]){
             g = new GenericShopGUI(this, player, settings, VANILLA_REWARDS);
+            g.open();
+        } else if (index == CUSTOM_SLOTS[2]) {
+            g = new GenericShopGUI(this, player, settings, CUSTOM_EXCHANGES);
             g.open();
         }
 

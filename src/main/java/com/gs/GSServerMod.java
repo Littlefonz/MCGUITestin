@@ -54,7 +54,7 @@ public class GSServerMod implements ModInitializer {
 
 				g.open();
 
-				context.getSource().sendSuccess(() -> Component.literal("§7Note: You must have Prize Tickets to buy these items!"), false);
+				// context.getSource().sendSuccess(() -> Component.literal("§7Note: You must have Prize Tickets to buy these items!"), false);
 				return 1;
 			}));
 		});
