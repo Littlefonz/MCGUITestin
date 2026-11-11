@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -15,9 +16,35 @@ public class Trades {
     public Trades() {
 	}
 
-	public record Offer(int count, Item item) {
 
+	public record Offer(int count, Item item, DataComponentPatch patch, boolean patchIsExclusive) {
+    	public Offer(int count, Item item) {
+            this(count, item, DataComponentPatch.EMPTY, true);
+        }
 
+        public boolean isSameItemSameComponents(ItemStack stack) {
+            if (!stack.is(item))
+                return false;
+            ItemStack o = new ItemStack(item);
+            o.applyComponents(patch);
+
+            if (patchIsExclusive) { // stack cannot have other components
+                return ItemStack.isSameItemSameComponents(o, stack);
+            } else { // stack can have other components
+                ItemStack victim = stack.copy();
+                victim.applyComponents(patch);
+
+                return ItemStack.isSameItemSameComponents(stack, victim);
+            }
+        }
+
+        public int countItems(Container c) {
+            int tot = 0;
+            for (ItemStack s : c)
+                if (isSameItemSameComponents(s))
+                    tot += s.count();
+            return tot;
+        }
 	}
 
     public record Reward(int count, Item item, DataComponentPatch patch) {

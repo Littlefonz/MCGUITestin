@@ -177,15 +177,15 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         Trade trade = trades[slot];
         Inventory inv = player.getInventory();
 
-        for(int i = 0; i < trade.offers().length; i++){
+        for (Offer o : trade.offers()) {
             // Player currency count
-            int playerTradeItems = inv.countItem(trade.offer(i));
+            int playerTradeItems = o.countItems(inv);
             if (playerTradeItems <= 0)
                 return;
 
 
             // Check if the player has enough currency for the given reward
-            if (playerTradeItems < trade.cost(i))
+            if (playerTradeItems < o.count())
                 return;
         }
 
@@ -219,7 +219,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         Inventory inv = player.getInventory();
 
         for (Offer o : trade.offers())
-            removeNItemsFromContainer(inv, o.item(), o.count());
+            removeFromContainer(inv, o);
 
         for (Reward r : trade.rewards()) {
             MapType type = MAP_TYPES.get(r.item());
@@ -291,18 +291,29 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         }
     }
 
-    public void removeNItemsFromContainer(Container c, Item item, int n) {
-        int remaining = n;
+    public void removeFromContainer(Container c, Item item, int n) {
+        int removedCount, remaining = n;
         int size = c.getContainerSize();
         for (int i = 0; remaining > 0 && i < size; i++) {
             ItemStack stack = Objects.requireNonNull(c.getSlot(i)).get();
             if (stack.isEmpty() || !ItemStack.isSameItemSameComponents(stack, item.getDefaultInstance()))
                 continue;
 
-            int removedCount = Math.min(stack.count(), remaining);
-            c.removeItem(i, removedCount);
-            remaining = Math.max(remaining - removedCount, 0);
+            c.removeItem(i, removedCount = Math.min(stack.count(), remaining));
+            remaining -= removedCount;
         }
+    }
+
+    public void removeFromContainer(Container c, Offer o) {
+        int removedCount, remaining = o.count();
+        for (int i = 0; remaining > 0 && i < size; i++) {
+            ItemStack stack = Objects.requireNonNull(c.getSlot(i)).get();
+            if (!o.isSameItemSameComponents(stack))
+                continue;
+            c.removeItem(i, removedCount = Math.min(stack.count(), remaining));
+            remaining -= removedCount;
+        }
+        System.out.println(remaining);
     }
 
     private int rewardSlot(int slot){
