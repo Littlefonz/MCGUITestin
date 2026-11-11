@@ -1,14 +1,12 @@
 package com.gs.guis;
 
 import com.gs.GSServerMod;
-import com.gs.Items.ModItems;
 import com.gs.Trades.Trade;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
