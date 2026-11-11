@@ -13,10 +13,12 @@
   "item.gs-server-mod.wheel_token.info_2": "§e(Right Click to see odds!)",
 
   "item.gs-server-mod.astro_coin": "§bAstro Coin",
-  "item.gs-server-mod.astro_coin.info": "§3Rare Coins found from Necromerger",
+  "item.gs-server-mod.astro_coin.info_1": "§3Rare Coins found from Necromerger",
+  "item.gs-server-mod.astro_coin.info_2": "§7(Coveted by Mr. C.D.)",
 
   "item.gs-server-mod.energy_cube": "§bEnergy Cube",
-  "item.gs-server-mod.energy_cube.info": "§3Rare Currency found from Necromerger",
+  "item.gs-server-mod.energy_cube.info_1": "§3Rare Currency found from Necromerger",
+  "item.gs-server-mod.energy_cube.info_2": "§7(Coveted by Mr. C.D.)",
 
   "item.gs-server-mod.rusted_crown": "§eRusted Crown",
   "item.gs-server-mod.rusted_crown.info": "§6The Regal Artifact leftover from an Apocalypse",
