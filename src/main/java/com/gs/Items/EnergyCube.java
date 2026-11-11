@@ -23,6 +23,7 @@ public class EnergyCube extends Item implements PolymerItem{
         super(properties);
     }
 
+
     @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
         return Items.BLUE_ICE;

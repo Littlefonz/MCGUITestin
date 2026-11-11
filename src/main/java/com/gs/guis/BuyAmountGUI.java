@@ -147,9 +147,8 @@ public class BuyAmountGUI extends SimpleGui {
                 if (settings.confirmation) {
                     new ConfirmationGUI<>(player, trade.guiElement(multiplier), this.g, trade.multiply(multiplier)).open();
                     return false;
-                } else {
-                    g.confirm(true, trade.multiply(multiplier));
                 }
+                g.confirm(true, trade.multiply(multiplier));
             }
         }
 

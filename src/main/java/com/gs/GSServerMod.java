@@ -42,7 +42,7 @@ public class GSServerMod implements ModInitializer {
 
 		ModItems.initialize();
 
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+		CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
 			dispatcher.register(Commands.literal("rewards").executes(context -> {
 				if (!context.getSource().isPlayer()) {
 					context.getSource().sendSuccess(() -> Component.literal("rewards sent outside of a player."),

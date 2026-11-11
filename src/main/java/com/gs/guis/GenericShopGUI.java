@@ -203,6 +203,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         this.confirm(true, trade);
     }
 
+    @Override
     public void confirm(boolean confirmed, Trade item) {
         if (!isOpen()) {
             updateSettings();
@@ -291,7 +292,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         }
     }
 
-    public void removeFromContainer(Container c, Item item, int n) {
+    public static void removeFromContainer(Container c, Item item, int n) {
         int removedCount, remaining = n;
         int size = c.getContainerSize();
         for (int i = 0; remaining > 0 && i < size; i++) {
@@ -304,8 +305,9 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         }
     }
 
-    public void removeFromContainer(Container c, Offer o) {
+    public static void removeFromContainer(Container c, Offer o) {
         int removedCount, remaining = o.count();
+        int size = c.getContainerSize();
         for (int i = 0; remaining > 0 && i < size; i++) {
             ItemStack stack = Objects.requireNonNull(c.getSlot(i)).get();
             if (!o.isSameItemSameComponents(stack))
@@ -316,7 +318,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         System.out.println(remaining);
     }
 
-    private int rewardSlot(int slot){
+    private static int rewardSlot(int slot){
         //First slot + Available Row Slots * Row Number
         return 10 + (slot % 7) + (slot / 7) * 9;
     }

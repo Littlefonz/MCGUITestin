@@ -78,7 +78,7 @@ public class GenericShowcaseGUI extends SimpleGui {
         return true;
     }
 
-    private int displaySlot(int slot){
+    private static int displaySlot(int slot){
         //First slot + Available Row Slots * Row Number
         return 10 + (slot % 7) + (slot / 7) * 9;
     }

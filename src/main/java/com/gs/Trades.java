@@ -30,12 +30,13 @@ public class Trades {
 
             if (patchIsExclusive) { // stack cannot have other components
                 return ItemStack.isSameItemSameComponents(o, stack);
-            } else { // stack can have other components
-                ItemStack victim = stack.copy();
-                victim.applyComponents(patch);
-
-                return ItemStack.isSameItemSameComponents(stack, victim);
             }
+            
+            // stack can have other components
+			ItemStack victim = stack.copy();
+			victim.applyComponents(patch);
+
+			return ItemStack.isSameItemSameComponents(stack, victim);
         }
 
         public int countItems(Container c) {
@@ -85,6 +86,7 @@ public class Trades {
         public Trade from(int price, Item item) {
             return new Trade(new Offer[] { new Offer(price, item) }, rewards);
         }
+
 
         public Trade from(Offer[] offerings) {
             return new Trade(offerings, rewards);
