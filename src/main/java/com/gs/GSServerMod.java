@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.gs.Items.ModItems;
 import com.gs.guis.RewardOptionsGUI;
 import com.gs.guis.ShopSettings;
+import com.gs.item_storage.ItemStorageCommands;
 
 public class GSServerMod implements ModInitializer {
 	public static final String MOD_ID = "gs-server-mod";
@@ -33,6 +34,7 @@ public class GSServerMod implements ModInitializer {
 		    .copyOnDeath()
 		    .initializer(() -> new ShopSettings())
 	);
+
 
 	@Override
 	public void onInitialize() {
@@ -58,6 +60,8 @@ public class GSServerMod implements ModInitializer {
 				return 1;
 			}));
 		});
+
+		ItemStorageCommands.initialize();
 	}
 
 	public static Identifier id(String path) {

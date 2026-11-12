@@ -12,10 +12,6 @@ import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
-interface Confirmable<T> {
-    void confirm(boolean b, T confirmedItem);
-}
-
 public class ConfirmationGUI<T> extends SimpleGui {
 
 
@@ -27,8 +23,11 @@ public class ConfirmationGUI<T> extends SimpleGui {
         this(player, new GuiElementBuilder(stack), g, item);
     }
     public ConfirmationGUI(ServerPlayer player, GuiElementBuilder guiElement, Confirmable<T> g, T item){
+        this(player, guiElement, Component.literal("Exchange for this item?"), g, item);
+    }
+    public ConfirmationGUI(ServerPlayer player, GuiElementBuilder guiElement, Component title, Confirmable<T> g, T item){
         super(MenuType.GENERIC_9x3, player, false);
-        this.setTitle(Component.literal("Exchange for this item?"));
+        this.setTitle(title);
 
         this.element = guiElement;
 
@@ -59,9 +58,11 @@ public class ConfirmationGUI<T> extends SimpleGui {
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
         if(index == DENY){
             conf.confirm(false, item);
+            close();
             return true;
         } else if(index == CONFIRM){
             conf.confirm(true, item);
+            close();
             return true;
         }
 
