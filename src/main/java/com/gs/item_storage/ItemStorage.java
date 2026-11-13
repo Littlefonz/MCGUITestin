@@ -21,9 +21,9 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
 public class ItemStorage extends SavedData {
-    private HashMap<String, ItemCollection> collections;
+    private HashMap<String, ItemSamples> collections;
 
-    public HashMap<String, ItemCollection> getCollections() {
+    public HashMap<String, ItemSamples> getCollections() {
         return collections;
     }
 
@@ -39,16 +39,16 @@ public class ItemStorage extends SavedData {
         collections = new HashMap<>();
     }
 
-    public ItemStorage(List<ItemCollection> collections) {
+    public ItemStorage(List<ItemSamples> collections) {
 
-        HashMap<String, ItemCollection> h = new HashMap<>();
-        for (ItemCollection c : collections)
+        HashMap<String, ItemSamples> h = new HashMap<>();
+        for (ItemSamples c : collections)
             h.put(c.collection_id, c);
 
         this.collections = h;
     }
 
-    public ItemStorage(HashMap<String, ItemCollection> collections) {
+    public ItemStorage(HashMap<String, ItemSamples> collections) {
         this.collections = collections;
     }
 
@@ -56,8 +56,8 @@ public class ItemStorage extends SavedData {
         return server.getDataStorage().computeIfAbsent(TYPE);
     }
 
-    public ItemCollection newCollection(String id) {
-        ItemCollection ic = new ItemCollection(id);
+    public ItemSamples newCollection(String id) {
+        ItemSamples ic = new ItemSamples(id);
 
         if (!collections.containsKey(id)) {
             collections.put(id, ic);
@@ -83,9 +83,9 @@ public class ItemStorage extends SavedData {
     }
 
     private static final Codec<ItemStorage> CODEC = RecordCodecBuilder.create(instance -> instance
-        .group(ItemCollection.CODEC.listOf()
+        .group(ItemSamples.CODEC.listOf()
             .fieldOf("collections")
-            .forGetter(is -> new ArrayList<ItemCollection>(is.getCollections().values())))
+            .forGetter(is -> new ArrayList<ItemSamples>(is.getCollections().values())))
         .apply(instance, ItemStorage::new));
 
     private static final SavedDataType<ItemStorage> TYPE = new SavedDataType<>(GSServerMod.id("item_storage"),

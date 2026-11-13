@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.gs.GSServerMod;
+import com.gs.ItemTransactions;
 import com.gs.Trades.Offer;
 import com.gs.Trades.Reward;
 import com.gs.Trades.Trade;
@@ -220,7 +221,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         Inventory inv = player.getInventory();
 
         for (Offer o : trade.offers())
-            removeFromContainer(inv, o);
+            ItemTransactions.removeFromContainer(inv, o);
 
         for (Reward r : trade.rewards()) {
             MapType type = MAP_TYPES.get(r.item());
@@ -229,7 +230,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
                 continue;
             }
 
-            giveToPlayer(player, inv, r.stack());
+            ItemTransactions.giveToPlayer(player, inv, r.stack());
         }
 
         GSServerMod.LOGGER.info(String.format(
@@ -252,7 +253,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
                 return;
             }
 
-            giveToPlayer(player, inv, map);
+            ItemTransactions.giveToPlayer(player, inv, map);
             filledMapCount++;
         }
     }
@@ -277,45 +278,6 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
     protected void save_and_close() {
         player.setAttached(GSServerMod.SHOP_SETTINGS_ATTACHMENT, menuSettings);
         close();
-    }
-
-    private static void giveToPlayer(ServerPlayer player, Inventory inv, ItemStack stack) {
-        if (stack.isEmpty()) return;
-        if (inv.getFreeSlot() == -1 && inv.getSlotWithRemainingSpace(stack) == -1) {
-            player.drop(stack, true, Prediction.SERVER_ONLY);
-            return;
-        }
-
-        inv.add(stack); // mutates stack to report remaining items
-        if (!stack.isEmpty()) { // Stack is always empty after `inv.add()` in creative mode! works properly in survival.
-            giveToPlayer(player, inv, stack);
-        }
-    }
-
-    public static void removeFromContainer(Container c, Item item, int n) {
-        int removedCount, remaining = n;
-        int size = c.getContainerSize();
-        for (int i = 0; remaining > 0 && i < size; i++) {
-            ItemStack stack = Objects.requireNonNull(c.getSlot(i)).get();
-            if (stack.isEmpty() || !ItemStack.isSameItemSameComponents(stack, item.getDefaultInstance()))
-                continue;
-
-            c.removeItem(i, removedCount = Math.min(stack.count(), remaining));
-            remaining -= removedCount;
-        }
-    }
-
-    public static void removeFromContainer(Container c, Offer o) {
-        int removedCount, remaining = o.count();
-        int size = c.getContainerSize();
-        for (int i = 0; remaining > 0 && i < size; i++) {
-            ItemStack stack = Objects.requireNonNull(c.getSlot(i)).get();
-            if (!o.isSameItemSameComponents(stack))
-                continue;
-            c.removeItem(i, removedCount = Math.min(stack.count(), remaining));
-            remaining -= removedCount;
-        }
-        System.out.println(remaining);
     }
 
     private static int rewardSlot(int slot){

@@ -3,11 +3,9 @@ package com.gs.item_storage;
 import com.gs.guis.CollectionView;
 import com.gs.guis.Confirmable;
 import com.gs.guis.ConfirmationGUI;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.sun.jdi.connect.Connector.BooleanArgument;
 
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -15,12 +13,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.SlotArgument;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -107,8 +102,7 @@ public class ItemStorageCommands {
         ServerPlayer player = ctx.getSource().getPlayer();
         ItemStorage storage = ItemStorage.fromServer(ctx.getSource().getServer());
         String id = ctx.getArgument("collection_id", String.class);
-
-        ItemCollection collection;
+        ItemSamples collection;
         if ((collection = storage.getCollections().get(id)) == null) {
             ctx.getSource()
                 .sendSuccess(() -> Component.literal(String.format("§4[GSIS] collection id \"%s\" not found!", id)),
@@ -158,7 +152,7 @@ public class ItemStorageCommands {
         ItemStorage storage = ItemStorage.fromServer(ctx.getSource().getServer());
         String id = ctx.getArgument("collection_id", String.class);
 
-        ItemCollection c;
+        ItemSamples c;
         if ((c = storage.getCollections().get(id)) == null) {
             ctx.getSource()
                 .sendSuccess(() -> Component.literal(String.format("§4[GSIS] collection id \"%s\" not found!", id)),
@@ -177,7 +171,7 @@ public class ItemStorageCommands {
             return 1;
         }
 
-        c.stacks.add(target);
+        c.push(1.0f, target);
         storage.setDirty();
 
         ctx.getSource()
@@ -193,7 +187,7 @@ public class ItemStorageCommands {
         ItemStorage storage = ItemStorage.fromServer(ctx.getSource().getServer());
         String id = ctx.getArgument("collection_id", String.class);
 
-        ItemCollection c;
+        ItemSamples c;
         if ((c = storage.getCollections().get(id)) == null) {
             ctx.getSource()
                 .sendSuccess(() -> Component.literal(String.format("§4[GSIS] collection id \"%s\" not found!", id)),
@@ -212,12 +206,13 @@ public class ItemStorageCommands {
             return 1;
         }
 
-        c.stacks.ensureCapacity(c.stacks.size() + target.getContainerSize());
+        // c.stacks.ensureCapacity(c.stacks.size() + target.getContainerSize());
         int count = 0;
         for (ItemStack slot : target) {
             if (slot.isEmpty())
                 continue;
-            c.stacks.add(slot);
+
+            c.push(1.0f, slot);
             count++;
         }
 
