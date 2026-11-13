@@ -21,13 +21,14 @@ public class ItemCollection {
         this.collection_id = collection_id;
         this.stacks = new ArrayList<>(stacks);
     }
+
     public ItemCollection(String collection_id) {
         this.collection_id = collection_id;
         this.stacks = new ArrayList<>(9 * 3);
     }
 
-    public static final Codec<ItemCollection> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.fieldOf("collection_id").forGetter(c -> c.collection_id),
+    public static final Codec<ItemCollection> CODEC = RecordCodecBuilder.create(instance -> instance
+        .group(Codec.STRING.fieldOf("collection_id").forGetter(c -> c.collection_id),
             ItemStack.CODEC.listOf().fieldOf("stacks").orElseGet(() -> new ArrayList<>()).forGetter(c -> c.stacks))
-            .apply(instance, ItemCollection::new));
+        .apply(instance, ItemCollection::new));
 }

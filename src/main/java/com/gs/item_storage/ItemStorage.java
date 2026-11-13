@@ -70,7 +70,7 @@ public class ItemStorage extends SavedData {
     public static class IdSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
         public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context,
-                SuggestionsBuilder builder) throws CommandSyntaxException {
+            SuggestionsBuilder builder) throws CommandSyntaxException {
 
             ItemStorage storage = ItemStorage.fromServer(context.getSource().getServer());
 
@@ -83,13 +83,13 @@ public class ItemStorage extends SavedData {
     }
 
     private static final Codec<ItemStorage> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(ItemCollection.CODEC.listOf().fieldOf("collections")
-                    .forGetter(is -> new ArrayList<ItemCollection>(is.getCollections().values())))
-            .apply(instance, ItemStorage::new));
+        .group(ItemCollection.CODEC.listOf()
+            .fieldOf("collections")
+            .forGetter(is -> new ArrayList<ItemCollection>(is.getCollections().values())))
+        .apply(instance, ItemStorage::new));
 
-    private static final SavedDataType<ItemStorage> TYPE = new SavedDataType<>(
-            GSServerMod.id("item_storage"),
-            ItemStorage::new,
-            CODEC,
-            null);
+    private static final SavedDataType<ItemStorage> TYPE = new SavedDataType<>(GSServerMod.id("item_storage"),
+        ItemStorage::new,
+        CODEC,
+        null);
 }

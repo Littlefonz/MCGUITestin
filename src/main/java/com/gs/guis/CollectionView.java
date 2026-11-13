@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import com.gs.item_storage.ItemCollection;
+import com.gs.item_storage.ItemStorage;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
@@ -21,6 +22,7 @@ public class CollectionView extends SimpleGui {
     private static final int PAGE_Y = 6;
     private static final int PAGE_CAPACITY = PAGE_X * PAGE_Y;
 
+    private final ItemStorage storage;
     private final ItemCollection collection;
     private int page = 0;
     private int pageMax;
@@ -29,24 +31,26 @@ public class CollectionView extends SimpleGui {
     private static final int BCK_SLOT = 9 * 5 - 1;
     private static final int FWD_SLOT = 9 * 6 - 1;
 
-    public CollectionView(final ServerPlayer player, final ItemCollection collection) {
+    public CollectionView(final ServerPlayer player, final ItemStorage storage, final ItemCollection collection) {
         super(MENU_TYPE, player, false);
+
+        this.storage = storage;
         this.collection = collection;
         this.pageMax = Math.max((int) Math.ceil(((double) collection.stacks.size()) / PAGE_CAPACITY), 1);
         updateTitle();
         setPageContents();
 
-        this.setSlot(TRASH_SLOT, GuiElementBuilder.from(Items.CAULDRON.getDefaultInstance())
-                .setName(Component.literal("Trash Item")));
-        this.setSlot(BCK_SLOT, GuiElementBuilder.from(Items.LADDER.getDefaultInstance())
-                .setName(Component.literal("Previous Page")));
+        this.setSlot(TRASH_SLOT,
+            GuiElementBuilder.from(Items.CAULDRON.getDefaultInstance()).setName(Component.literal("Trash Item")));
+        this.setSlot(BCK_SLOT,
+            GuiElementBuilder.from(Items.LADDER.getDefaultInstance()).setName(Component.literal("Previous Page")));
         this.setSlot(FWD_SLOT,
-                GuiElementBuilder.from(Items.LADDER.getDefaultInstance()).setName(Component.literal("Next Page")));
+            GuiElementBuilder.from(Items.LADDER.getDefaultInstance()).setName(Component.literal("Next Page")));
     }
 
     public void updateTitle() {
-        setTitle(Component
-                .literal(String.format("Collection: %s (%d/%d)", collection.collection_id, page + 1, pageMax)));
+        setTitle(
+            Component.literal(String.format("Collection: %s (%d/%d)", collection.collection_id, page + 1, pageMax)));
     }
 
     public void setPageContents() {
@@ -133,6 +137,8 @@ public class CollectionView extends SimpleGui {
         else
             setPageContents();
 
+
+        storage.setDirty();
         updateTitle();
         return true;
     }
