@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Consumable;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import com.gs.GSServerMod;
@@ -36,13 +37,13 @@ public class CollectionView extends SimpleGui {
     private final ArrayList<WeightedStack> stacks;
     private int page = 0;
     private int pageMax;
-
-    private final ItemStack multiplierStack;
+    private double multiplier = 1;
 
     private static final int MULTIPLIER_SLOT = 9 * 3 - 1;
     private static final int SAVE_SLOT = 9 * 4 - 1;
     private static final int BCK_SLOT = 9 * 5 - 1;
     private static final int FWD_SLOT = 9 * 6 - 1;
+    private static final DecimalFormat df = new DecimalFormat("0.###");
 
     public CollectionView(final ServerPlayer player, final ItemStorage storage, final ItemSamples collection) {
         super(MENU_TYPE, player, false);
@@ -51,15 +52,15 @@ public class CollectionView extends SimpleGui {
         this.samples = collection;
         this.stacks = new ArrayList<>(this.samples.collection());
 
-        this.multiplierStack = new ItemStack(Items.BONE_MEAL, 10);
-        multiplierStack.set(DataComponents.DAMAGE, 0); // Just something to set it apart
-
         this.pageMax = Math.max((int) Math.ceil(((double) stacks.size()) / PAGE_CAPACITY), 1);
         updateTitle();
         setPageContents();
 
-        this.setSlot(MULTIPLIER_SLOT,
-            GuiElementBuilder.from(multiplierStack).setName(Component.literal("+10, +100 shift")));
+        for (int i = 8; i < getVirtualSize(); i += 9) {
+            this.setSlot(i,
+                GuiElementBuilder.from(Items.STAINED_GLASS_PANE.white().getDefaultInstance()).hideDefaultTooltip());
+        }
+        updateMultiplierSlot();
         this.setSlot(SAVE_SLOT,
             GuiElementBuilder.from(Items.CONCRETE.green().getDefaultInstance())
                 .setName(Component.literal("Save Changes")));
@@ -89,75 +90,53 @@ public class CollectionView extends SimpleGui {
             WeightedStack ws = stacks.get(idx);
             float ratio = (ws.w() / max);
             this.setSlot(x + y * 9,
-                new AnimatedGuiElementBuilder().setInterval(50) // 2.5s
-                    .setItem(ws.s().getItem())
-                    .setCount(Math.max((int) Math.ceil(64.0 * ratio), 1))
-                    .addLoreLine(Component.literal(String.format("§7§oCount: %d", ws.s().getCount())))
-                    .addLoreLine(Component.literal(String.format("§7§oWeight: %.1f (%.3f%%)", ws.w(), ratio * 100)))
-                    .addLoreLine(Component.literal("§7§oLeft click: +10, Right click: -10"))
-                    .saveItemStack()
-                    .setItem(ws.s().getItem())
-                    .setCount(ws.s().getCount())
-                    .addLoreLine(Component.literal(String.format("§7§oCount: %d", ws.s().getCount())))
-                    .addLoreLine(Component.literal(String.format("§7§oWeight: %.1f (%.3f%%)", ws.w(), ratio * 100)))
-                    .addLoreLine(Component.literal("§7§oLeft click: +10, Right click: -10"))
-                    .saveItemStack());
+                new GuiElementBuilder(ws.s())
+                    .addLoreLine(Component.literal(
+                        String.format("§7§oWeight: %s (%s%% chance)", df.format(ws.w()), df.format(ratio * 100))))
+                    .addLoreLine(Component
+                        .literal(String.format("§7§oLMB: +%s, RMB: -%s", df.format(multiplier), df.format(multiplier))))
+                    .addLoreLine(Component.literal(String.format("§7§oSHIFT LMB: +%s, RMB: -%s",
+                        df.format(10 * multiplier),
+                        df.format(10 * multiplier)))));
         }
         if (count < PAGE_CAPACITY) {
             for (int i = count; i < PAGE_CAPACITY; i++) {
 
                 int x = i % PAGE_X;
                 int y = i / PAGE_X;
-                this.setSlot(x + y * 9, new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()));
+                this.setSlot(x + y * 9, ItemStack.EMPTY);
             }
         }
     }
 
-    @Override
-    public boolean onAnyClick(int index, ClickType type, ContainerInput action) {
-        if (player.containerMenu.getCarried() == multiplierStack) {
-            if (index < 0)
-                player.containerMenu.setCarried(ItemStack.EMPTY);
-            return false;
-        }
+    private void updateMultiplierSlot() {
 
-        return super.onAnyClick(index, type, action);
+        setSlot(MULTIPLIER_SLOT,
+            GuiElementBuilder.from(Items.BONE_MEAL.getDefaultInstance())
+                .setName(Component.literal(String.format("Clicks x%s", df.format(multiplier))))
+                .addLoreLine(Component.literal("§7§oLMB: *10, RMB: /10"))
+                .addLoreLine(Component.literal(String.format("§7§oSHIFT LMB: Reset"))));
     }
 
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
 
         if (index == SAVE_SLOT) {
-
-            for (int i = stacks.size() - 1; i >= 0; i--) {
-                WeightedStack s = stacks.get(i);
-                if (s.w().equals(0.0f)) {
-                    ItemTransactions.giveToPlayer(player, player.getInventory(), s.s());
-                    stacks.remove(i);
-                }
-            }
-
-            samples.setItems(stacks);
-            storage.setDirty();
-            stacks.clear();
-            stacks.addAll(samples.collection());
-            setPageContents();
-
-            GSServerMod.LOGGER.info(String.format("Player %s saved collection \"%s\" with items \"%s\"",
-                player.nameAndId().name(),
-                samples.collection_id,
-                stacks));
-
+            this.save();
             return false;
         }
 
         if (index == MULTIPLIER_SLOT) {
-            ItemStack carried = player.containerMenu.getCarried();
-            if (carried.isEmpty())
-                player.containerMenu.setCarried(multiplierStack);
-            else if (carried.equals(multiplierStack))
-                player.containerMenu.setCarried(ItemStack.EMPTY);
+            if (type == ClickType.MOUSE_LEFT_SHIFT)
+                multiplier = 1;
+            else if (type == ClickType.MOUSE_LEFT)
+                multiplier *= 10;
+            else if (type == ClickType.MOUSE_RIGHT)
+                multiplier = Math.max(multiplier / 10, 0.001);
 
+            updateMultiplierSlot();
+            setPageContents();
+            return false;
         }
 
         if (index == BCK_SLOT) {
@@ -183,7 +162,7 @@ public class CollectionView extends SimpleGui {
         boolean inBounds = collectionIndex < stacks.size() && collectionIndex >= 0;
         if (!inBounds) {
             ItemStack c = player.containerMenu.getCarried();
-            if (!c.isEmpty() && !(c.equals(multiplierStack))) {
+            if (!c.isEmpty()) {
                 stacks.add(new WeightedStack(1.0f, c.copy()));
             }
             setPageContents();
@@ -200,15 +179,18 @@ public class CollectionView extends SimpleGui {
         // Add to selected item weight
         System.out.println("" + index + " " + type + " " + action);
         float factor = switch (type) {
-            case ClickType.MOUSE_LEFT_SHIFT -> 1f;
-            case ClickType.MOUSE_LEFT -> 0.1f;
-            case ClickType.MOUSE_RIGHT -> -0.1f;
-            case ClickType.MOUSE_RIGHT_SHIFT -> -1f;
-            default -> 0.1f;
+            case ClickType.MOUSE_LEFT_SHIFT -> 10f;
+            case ClickType.MOUSE_LEFT -> 1f;
+            case ClickType.MOUSE_RIGHT -> -1f;
+            case ClickType.MOUSE_RIGHT_SHIFT -> -10f;
+            default -> 1f;
         };
-        factor *= (player.containerMenu.getCarried().equals(multiplierStack)) ? 100 : 1;
+        factor *= multiplier;
 
         float newWeight = Math.max(stack.w() + factor, 0.0f);
+        if (!Float.isFinite(newWeight)) {
+            newWeight = 0.0f;
+        }
 
         stacks.set(collectionIndex, stack.withWeight(newWeight));
 
@@ -218,8 +200,29 @@ public class CollectionView extends SimpleGui {
     }
 
     @Override
-    public boolean canPlayerClose() {
-        return !(player.containerMenu.getCarried().equals(multiplierStack));
+    public void onPlayerClose(boolean success) {
+        save();
+    }
+
+    public void save() {
+        for (int i = stacks.size() - 1; i >= 0; i--) {
+            WeightedStack s = stacks.get(i);
+            if (s.w().equals(0.0f)) {
+                ItemTransactions.giveToPlayer(player, player.getInventory(), s.s());
+                stacks.remove(i);
+            }
+        }
+
+        samples.setItems(stacks);
+        storage.setDirty();
+        stacks.clear();
+        stacks.addAll(samples.collection());
+        setPageContents();
+
+        GSServerMod.LOGGER.info(String.format("Player %s saved collection \"%s\" with items \"%s\"",
+            player.nameAndId().name(),
+            samples.collection_id,
+            stacks));
     }
 
     public boolean incollectionBounds(int index) {
