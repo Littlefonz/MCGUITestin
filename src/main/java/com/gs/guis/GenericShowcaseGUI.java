@@ -17,13 +17,14 @@ import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
 public class GenericShowcaseGUI extends SimpleGui {
-    //Displays
+    // Displays
     Trade[] display;
     Component[] components;
 
-    //UI Locations
-    private static final int[] GREY_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, 1, 2, 3, 4, 5, 6, 7, (9*3)+1, (9*3)+2, (9*3)+3, (9*3)+4, (9*3)+5, (9*3)+6, (9*3)+7};
-    private static final int CLOSE_BUTTON_SLOT = (9*3)+4;
+    // UI Locations
+    private static final int[] GREY_BORDER = { 0, 8, (9), (9) + 8, (9 * 2), (9 * 2) + 8, (9 * 3), (9 * 3) + 8, 1, 2, 3,
+        4, 5, 6, 7, (9 * 3) + 1, (9 * 3) + 2, (9 * 3) + 3, (9 * 3) + 4, (9 * 3) + 5, (9 * 3) + 6, (9 * 3) + 7 };
+    private static final int CLOSE_BUTTON_SLOT = (9 * 3) + 4;
 
     // GUI Setup
     public GenericShowcaseGUI(ServerPlayer player, Trade[] display, Component[] components) {
@@ -44,17 +45,17 @@ public class GenericShowcaseGUI extends SimpleGui {
     }
 
     private void setupMainMenu() {
-        //Gray Border
+        // Gray Border
         for (int s : GREY_BORDER)
             this.setSlot(s,
-                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
+                new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
 
-        //Close Button
+        // Close Button
         this.setSlot(CLOSE_BUTTON_SLOT, new GuiElementBuilder(Items.BARRIER).setName(Component.literal("Close")));
 
-        //Reward Section
+        // Reward Section
         for (int s = 0; s < display.length; s++) {
-            //Display
+            // Display
             ArrayList<Component> lore = new ArrayList<>();
             lore.add(Component.literal(""));
             lore.add(components[s]);
@@ -78,8 +79,8 @@ public class GenericShowcaseGUI extends SimpleGui {
         return true;
     }
 
-    private static int displaySlot(int slot){
-        //First slot + Available Row Slots * Row Number
+    private static int displaySlot(int slot) {
+        // First slot + Available Row Slots * Row Number
         return 10 + (slot % 7) + (slot / 7) * 9;
     }
 }

@@ -45,36 +45,39 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
     Trade[] trades;
 
     // UI Locations
-    private static final int[] RED_BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8, (9*3), (9*3)+8, (9*4), (9*4)+8, (9*5), (9*5)+8 };
-    private static final int[] GREY_BORDER = { 1, 2, 3, 4, 5, 6, 7, (9*5)+1, (9*5)+2, (9*5)+3, (9*5)+4, (9*5)+5, (9*5)+6, (9*5)+7};
-    private static final int BACK_BUTTON_SLOT = (9*5)+3;
-    private static final int CLOSE_BUTTON_SLOT = (9*5)+4;
-    private static final int CONFIRM_BUTTON_SLOT = (9*5)+5;
+    private static final int[] RED_BORDER = { 0, 8, (9), (9) + 8, (9 * 2), (9 * 2) + 8, (9 * 3), (9 * 3) + 8, (9 * 4),
+        (9 * 4) + 8, (9 * 5), (9 * 5) + 8 };
+    private static final int[] GREY_BORDER = { 1, 2, 3, 4, 5, 6, 7, (9 * 5) + 1, (9 * 5) + 2, (9 * 5) + 3, (9 * 5) + 4,
+        (9 * 5) + 5, (9 * 5) + 6, (9 * 5) + 7 };
+    private static final int BACK_BUTTON_SLOT = (9 * 5) + 3;
+    private static final int CLOSE_BUTTON_SLOT = (9 * 5) + 4;
+    private static final int CONFIRM_BUTTON_SLOT = (9 * 5) + 5;
     private static final int TITLE_SLOT = 4;
 
     // Mapping
-    private record MapType(TagKey<Structure> tag, Holder<MapDecorationType> decoration) {}
-    private static final Map<Item, MapType> MAP_TYPES = Map.of(
-            Items.ABANDONED_CAMP_MAP,   new MapType(StructureTags.ABANDONED_CAMP,
-                    MapDecorationTypes.ABANDONED_CAMP),
-            Items.BURIED_MINESHAFT_MAP, new MapType(StructureTags.ON_MINESHAFT_MAPS,
-                    MapDecorationTypes.MINESHAFT),
-            Items.BURIED_TREASURE_MAP,  new MapType(StructureTags.ON_TREASURE_MAPS,
-                    MapDecorationTypes.RED_X),
-            Items.DESERT_PYRAMID_MAP,   new MapType(StructureTags.ON_DESERT_PYRAMID_MAPS,
-                    MapDecorationTypes.DESERT_PYRAMID),
-            Items.JUNGLE_PYRAMID_MAP,   new MapType(StructureTags.ON_JUNGLE_PYRAMID_MAPS,
-                    MapDecorationTypes.JUNGLE_TEMPLE),
-            Items.OCEAN_MONUMENT_MAP,   new MapType(StructureTags.ON_OCEAN_MONUMENT_MAPS,
-                    MapDecorationTypes.OCEAN_MONUMENT),
-            Items.SWAMP_HUT_MAP,        new MapType(StructureTags.ON_SWAMP_HUT_MAPS,
-                    MapDecorationTypes.SWAMP_HUT),
-            Items.WOODLAND_MANSION_MAP, new MapType(StructureTags.ON_WOODLAND_MANSION_MAPS,
-                    MapDecorationTypes.WOODLAND_MANSION),
-            Items.BURIED_TRIAL_CHAMBERS_MAP, new MapType(StructureTags.ON_BURIED_TRIAL_CHAMBERS_MAPS,
-                    MapDecorationTypes.TRIAL_CHAMBERS),
-            Items.BURIED_ANCIENT_CITY_MAP, new MapType(StructureTags.ON_ANCIENT_CITY_MAPS,
-                    MapDecorationTypes.ANCIENT_CITY));
+    private record MapType(TagKey<Structure> tag, Holder<MapDecorationType> decoration) {
+    }
+
+    private static final Map<Item, MapType> MAP_TYPES = Map.of(Items.ABANDONED_CAMP_MAP,
+        new MapType(StructureTags.ABANDONED_CAMP, MapDecorationTypes.ABANDONED_CAMP),
+        Items.BURIED_MINESHAFT_MAP,
+        new MapType(StructureTags.ON_MINESHAFT_MAPS, MapDecorationTypes.MINESHAFT),
+        Items.BURIED_TREASURE_MAP,
+        new MapType(StructureTags.ON_TREASURE_MAPS, MapDecorationTypes.RED_X),
+        Items.DESERT_PYRAMID_MAP,
+        new MapType(StructureTags.ON_DESERT_PYRAMID_MAPS, MapDecorationTypes.DESERT_PYRAMID),
+        Items.JUNGLE_PYRAMID_MAP,
+        new MapType(StructureTags.ON_JUNGLE_PYRAMID_MAPS, MapDecorationTypes.JUNGLE_TEMPLE),
+        Items.OCEAN_MONUMENT_MAP,
+        new MapType(StructureTags.ON_OCEAN_MONUMENT_MAPS, MapDecorationTypes.OCEAN_MONUMENT),
+        Items.SWAMP_HUT_MAP,
+        new MapType(StructureTags.ON_SWAMP_HUT_MAPS, MapDecorationTypes.SWAMP_HUT),
+        Items.WOODLAND_MANSION_MAP,
+        new MapType(StructureTags.ON_WOODLAND_MANSION_MAPS, MapDecorationTypes.WOODLAND_MANSION),
+        Items.BURIED_TRIAL_CHAMBERS_MAP,
+        new MapType(StructureTags.ON_BURIED_TRIAL_CHAMBERS_MAPS, MapDecorationTypes.TRIAL_CHAMBERS),
+        Items.BURIED_ANCIENT_CITY_MAP,
+        new MapType(StructureTags.ON_ANCIENT_CITY_MAPS, MapDecorationTypes.ANCIENT_CITY));
 
     // GUI Setup
     public GenericShopGUI(SimpleGui parent, ServerPlayer player, ShopSettings settings, Trade[] rewards) {
@@ -98,15 +101,15 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         // Gray Border
         for (int s : GREY_BORDER)
             this.setSlot(s,
-                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
+                new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
 
         // Red Border
         for (int s : RED_BORDER)
             this.setSlot(s,
-                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()).hideTooltip());
+                new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()).hideTooltip());
 
         // Title
-        this.setSlot(TITLE_SLOT, new GuiElementBuilder(Items.PAPER));//.setName(Component.literal(components)));
+        this.setSlot(TITLE_SLOT, new GuiElementBuilder(Items.PAPER));// .setName(Component.literal(components)));
 
         // Back Button
         this.setSlot(BACK_BUTTON_SLOT, new GuiElementBuilder(Items.ARROW).setName(Component.literal("Back")));
@@ -117,11 +120,11 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         updateSettings();
     }
 
-    private void rewardDisplay(){
+    private void rewardDisplay() {
         for (int s = 0; s < trades.length; s++) {
             Trade r = trades[s];
 
-            //Display
+            // Display
             GuiElementBuilder element = r.guiElement()
                 .addLoreLine(Component.empty())
                 .addLoreLine(Component.literal("§eLeft Click to Exchange!"))
@@ -149,7 +152,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         if (index == CLOSE_BUTTON_SLOT)
             save_and_close();
 
-        if (index == CONFIRM_BUTTON_SLOT){
+        if (index == CONFIRM_BUTTON_SLOT) {
             this.menuSettings.confirmation = !this.menuSettings.confirmation;
             updateSettings();
             return false;
@@ -163,7 +166,7 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
                 slot = i;
                 break;
             }
-        //Check for a free slot
+        // Check for a free slot
         if (slot != -1) {
             rewardPreCheck(slot, type);
             return false;
@@ -184,18 +187,17 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
             if (playerTradeItems <= 0)
                 return;
 
-
             // Check if the player has enough currency for the given reward
             if (playerTradeItems < o.count())
                 return;
         }
 
-        if(clickType.isRight){
+        if (clickType.isRight) {
             new BuyAmountGUI(player, menuSettings, trade, this).open();
             return;
         }
 
-        if(menuSettings.confirmation){
+        if (menuSettings.confirmation) {
             new ConfirmationGUI<>(player, trade.guiElement(), this, trade).open();
             return;
         }
@@ -233,21 +235,18 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
             ItemTransactions.giveToPlayer(player, inv, r.stack());
         }
 
-        GSServerMod.LOGGER.info(String.format(
-            "Traded with %s %s",
-            player.nameAndId().name(),
-            trade.getString()
-        ));
+        GSServerMod.LOGGER.info(String.format("Traded with %s %s", player.nameAndId().name(), trade.getString()));
     }
 
     private void processMap(Inventory inv, MapType type, Reward reward, Offer[] offerings) {
         int filledMapCount = 0;
         int total = reward.count();
-        while (filledMapCount < total){
+        while (filledMapCount < total) {
             ItemStack map = fillMap(type, reward.item());
             if (map == null) { // map type was not found around the player
                 GSServerMod.LOGGER.error("No structure found nearby for this map!");
-                player.sendSystemMessage(Component.literal("§cNo structure found nearby for this map of type " + type.tag().getTranslationKey() + " !"));
+                player.sendSystemMessage(Component.literal(
+                    "§cNo structure found nearby for this map of type " + type.tag().getTranslationKey() + " !"));
                 player.sendSystemMessage(Component.literal("§cPlease contact an admin for compensation."));
 
                 return;
@@ -258,20 +257,23 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         }
     }
 
-
     // MISC //
 
     public void updateSettings() {
-        //Confirmation Button
+        // Confirmation Button
         ArrayList<Component> lore = new ArrayList<>();
         lore.add(Component.literal(""));
         lore.add(Component.literal("§7Click to Toggle Confirmation, which will prevent"));
         lore.add(Component.literal("§7you from buying items until you confirm again!"));
 
         if (menuSettings.confirmation) {
-            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)")).setLore(lore));
+            this.setSlot(CONFIRM_BUTTON_SLOT,
+                new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)"))
+                    .setLore(lore));
         } else {
-            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
+            this.setSlot(CONFIRM_BUTTON_SLOT,
+                new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)"))
+                    .setLore(lore));
         }
     }
 
@@ -280,11 +282,10 @@ public class GenericShopGUI extends SimpleGui implements com.gs.guis.Confirmable
         close();
     }
 
-    private static int rewardSlot(int slot){
-        //First slot + Available Row Slots * Row Number
+    private static int rewardSlot(int slot) {
+        // First slot + Available Row Slots * Row Number
         return 10 + (slot % 7) + (slot / 7) * 9;
     }
-
 
     private ItemStack fillMap(MapType type, Item originalItem) {
         ServerLevel level = player.level();

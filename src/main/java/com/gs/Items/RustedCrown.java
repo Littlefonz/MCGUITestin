@@ -24,7 +24,7 @@ import java.util.List;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 
-public class RustedCrown extends Item implements PolymerItem{
+public class RustedCrown extends Item implements PolymerItem {
     public RustedCrown(Item.Properties properties) {
         super(properties);
     }
@@ -35,30 +35,25 @@ public class RustedCrown extends Item implements PolymerItem{
     }
 
     @Override
-    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
+    public @Nullable Identifier
+        getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
         return Identifier.parse("minecraft:golden_helmet");
     }
 
-
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context,
-		HolderLookup.Provider lookup) {
-		// Create the base client-sided item stack representation
+    public ItemStack getPolymerItemStack(ItemStack itemStack,
+        TooltipFlag tooltipType,
+        PacketContext context,
+        HolderLookup.Provider lookup) {
+        // Create the base client-sided item stack representation
         ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, lookup);
         out.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 
         // Add the redstone coast trim and hide the trim tooltip
-        out.set(
-            DataComponents.TRIM,
-            new ArmorTrim(
-                lookup.lookupOrThrow(Registries.TRIM_MATERIAL).getOrThrow(TrimMaterials.REDSTONE),
-                lookup.lookupOrThrow(Registries.TRIM_PATTERN).getOrThrow(TrimPatterns.COAST)
-            )
-        );
-        out.set(
-            DataComponents.TOOLTIP_DISPLAY,
-            TooltipDisplay.DEFAULT.withHidden(DataComponents.TRIM, true)
-        );
+        out.set(DataComponents.TRIM,
+            new ArmorTrim(lookup.lookupOrThrow(Registries.TRIM_MATERIAL).getOrThrow(TrimMaterials.REDSTONE),
+                lookup.lookupOrThrow(Registries.TRIM_PATTERN).getOrThrow(TrimPatterns.COAST)));
+        out.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay.DEFAULT.withHidden(DataComponents.TRIM, true));
         return out;
     }
 

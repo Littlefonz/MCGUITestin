@@ -19,7 +19,7 @@ import java.util.List;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 
-public class AstroCoin extends Item implements PolymerItem{
+public class AstroCoin extends Item implements PolymerItem {
     public AstroCoin(Item.Properties properties) {
         super(properties);
     }
@@ -30,15 +30,17 @@ public class AstroCoin extends Item implements PolymerItem{
     }
 
     @Override
-    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
+    public @Nullable Identifier
+        getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
         return Identifier.parse("minecraft:emerald");
     }
 
-
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context,
-		HolderLookup.Provider lookup) {
-		// Create the base client-sided item stack representation
+    public ItemStack getPolymerItemStack(ItemStack itemStack,
+        TooltipFlag tooltipType,
+        PacketContext context,
+        HolderLookup.Provider lookup) {
+        // Create the base client-sided item stack representation
         ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, lookup);
         out.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 

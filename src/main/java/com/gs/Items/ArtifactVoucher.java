@@ -64,14 +64,16 @@ public class ArtifactVoucher extends Item implements PolymerItem {
     }
 
     @Override
-    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context,
-            HolderLookup.Provider lookup) {
+    public @Nullable Identifier
+        getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
         return Identifier.parse("minecraft:light_gray_cushion");
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context,
-            HolderLookup.Provider lookup) {
+    public ItemStack getPolymerItemStack(ItemStack itemStack,
+        TooltipFlag tooltipType,
+        PacketContext context,
+        HolderLookup.Provider lookup) {
         // Create the base client-sided item stack representation
         ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, lookup);
         out.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
@@ -85,11 +87,11 @@ public class ArtifactVoucher extends Item implements PolymerItem {
     }
 
     public enum RarityComponent implements StringRepresentable, TooltipProvider {
-        COMMON(0),
-        RARE(1),
-        EPIC(2),
-        LEGENDARY(3),
-        MYTHICAL(4);
+            COMMON(0),
+            RARE(1),
+            EPIC(2),
+            LEGENDARY(3),
+            MYTHICAL(4);
 
         private final int id;
 
@@ -138,8 +140,10 @@ public class ArtifactVoucher extends Item implements PolymerItem {
         }
 
         @Override
-        public void addToTooltip(TooltipContext context, Consumer<Component> consumer, TooltipFlag flag,
-                DataComponentGetter components) {
+        public void addToTooltip(TooltipContext context,
+            Consumer<Component> consumer,
+            TooltipFlag flag,
+            DataComponentGetter components) {
             consumer.accept(Component.translatable("item.gs-server-mod.artifact_voucher.rarity", this.displayName()));
         }
 
@@ -147,17 +151,16 @@ public class ArtifactVoucher extends Item implements PolymerItem {
 
         // Maps integer IDs back to enum values safely (returns FIRST if out of bounds)
         public static final java.util.function.IntFunction<RarityComponent> BY_ID = ByIdMap
-                .continuous(RarityComponent::getId, RarityComponent.values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+            .continuous(RarityComponent::getId, RarityComponent.values(), ByIdMap.OutOfBoundsStrategy.ZERO);
 
         // StreamCodec for networking
         public static final StreamCodec<ByteBuf, RarityComponent> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID,
-                RarityComponent::getId);
+            RarityComponent::getId);
 
     }
 
     public static final DataComponentType<RarityComponent> VOUCHER_RARITY = Registry.register(
-            BuiltInRegistries.DATA_COMPONENT_TYPE,
-            GSServerMod.id("voucher_rarity"),
-            DataComponentType.<RarityComponent>builder().persistent(RarityComponent.CODEC)
-                    .build());
+        BuiltInRegistries.DATA_COMPONENT_TYPE,
+        GSServerMod.id("voucher_rarity"),
+        DataComponentType.<RarityComponent>builder().persistent(RarityComponent.CODEC).build());
 }

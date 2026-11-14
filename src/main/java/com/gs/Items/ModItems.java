@@ -12,7 +12,8 @@ import java.util.function.Function;
 import eu.pb4.polymer.core.api.other.PolymerComponent;
 
 public class ModItems {
-    public static Item register(ResourceKey<Item> itemKey, Function<Item.Properties, Item> itemFactory, Item.Properties settings) {
+    public static Item
+        register(ResourceKey<Item> itemKey, Function<Item.Properties, Item> itemFactory, Item.Properties settings) {
         // Create the item instance.
         Item item = itemFactory.apply(settings.setId(itemKey));
 
@@ -22,15 +23,18 @@ public class ModItems {
         return item;
     }
 
-    //Items
+    // Items
     public static final Item PRIZE_TICKET = register(ModItemIDs.PRIZE_TICKET, PrizeTicket::new, new Item.Properties());
     public static final Item WHEEL_TOKEN = register(ModItemIDs.WHEEL_TOKEN, WheelToken::new, new Item.Properties());
-    public static final Item ARTIFACT_VOUCHER = register(ModItemIDs.ARTIFACT_VOUCHER, ArtifactVoucher::new, new Item.Properties());
+    public static final Item ARTIFACT_VOUCHER = register(ModItemIDs.ARTIFACT_VOUCHER,
+        ArtifactVoucher::new,
+        new Item.Properties());
     public static final Item ENERGY_CUBE = register(ModItemIDs.ENERGY_CUBE, EnergyCube::new, new Item.Properties());
     public static final Item RUSTED_CROWN = register(ModItemIDs.RUSTED_CROWN, RustedCrown::new, new Item.Properties());
     public static final Item ASTRO_COIN = register(ModItemIDs.ASTRO_COIN, AstroCoin::new, new Item.Properties());
-    public static final Item ASPECT_OF_THE_VOID = register(ModItemIDs.ASPECT_OF_THE_VOID, AspectOfTheVoid::new, new Item.Properties().spear(ToolMaterial.DIAMOND, 1.05f, 0f, 0f, 0f,0f,0f, 0f, 0f, 0f));
-
+    public static final Item ASPECT_OF_THE_VOID = register(ModItemIDs.ASPECT_OF_THE_VOID,
+        AspectOfTheVoid::new,
+        new Item.Properties().spear(ToolMaterial.DIAMOND, 1.05f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f));
 
     public static void initialize() {
         ItemComponentTooltipProviderRegistry.addLast(ArtifactVoucher.VOUCHER_RARITY);

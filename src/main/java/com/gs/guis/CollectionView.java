@@ -57,8 +57,7 @@ public class CollectionView extends SimpleGui {
         setPageContents();
 
         for (int i = 8; i < getVirtualSize(); i += 9) {
-            this.setSlot(i,
-                GuiElementBuilder.from(Items.STAINED_GLASS_PANE.white().getDefaultInstance()).hideDefaultTooltip());
+            this.setSlot(i, GuiElementBuilder.from(Items.STAINED_GLASS_PANE.gray().getDefaultInstance()).hideTooltip());
         }
         updateMultiplierSlot();
         this.setSlot(SAVE_SLOT,

@@ -37,7 +37,9 @@ public class WheelToken extends Item implements PolymerItem {
     public InteractionResult use(Level level, Player user, InteractionHand hand) {
         // Open GUI
         if (user instanceof ServerPlayer serverPlayerEntity) {
-            SimpleGui g = new GenericShowcaseGUI(serverPlayerEntity, GUIPresets.WHEEL_REWARDS, GUIPresets.WHEEL_ITEM_CHANCES);
+            SimpleGui g = new GenericShowcaseGUI(serverPlayerEntity,
+                GUIPresets.WHEEL_REWARDS,
+                GUIPresets.WHEEL_ITEM_CHANCES);
             g.open();
         }
 
@@ -50,14 +52,15 @@ public class WheelToken extends Item implements PolymerItem {
     }
 
     @Override
-    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
+    public @Nullable Identifier
+        getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
         return Identifier.parse("minecraft:sunflower");
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context,
-		Provider lookup) {
-		// Create the base client-sided item stack representation
+    public ItemStack
+        getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context, Provider lookup) {
+        // Create the base client-sided item stack representation
         ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, lookup);
         out.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 

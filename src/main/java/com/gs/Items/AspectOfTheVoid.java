@@ -28,8 +28,6 @@ import java.util.List;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
 
-
-
 public class AspectOfTheVoid extends Item implements PolymerItem {
     public AspectOfTheVoid(Item.Properties properties) {
         super(properties);
@@ -42,7 +40,7 @@ public class AspectOfTheVoid extends Item implements PolymerItem {
         int MAX_TP_DISTANCE = 8;
         boolean TP_TO_BLOCK = false;
 
-        if(user.isShiftKeyDown()){
+        if (user.isShiftKeyDown()) {
             COST = 4;
             MAX_TP_DISTANCE = 61;
             TP_TO_BLOCK = true;
@@ -54,13 +52,13 @@ public class AspectOfTheVoid extends Item implements PolymerItem {
             Inventory playerInventory = user.getInventory();
             ServerLevel playerDimension = level.getServer().getLevel(level.dimension());
 
-            if(playerInventory.countItem(Items.ENDER_PEARL) > COST){
+            if (playerInventory.countItem(Items.ENDER_PEARL) > COST) {
                 // Initial Values
                 double HORIZONTAL_TP_OFFSET = 0.5;
                 int VERTICAL_TP_OFFSET = 1;
                 int finalTPDistance = 0;
                 Vec3 finalTPLocation = null;
-                Vec3 finalTPMomentum = new Vec3(0,0,0);
+                Vec3 finalTPMomentum = new Vec3(0, 0, 0);
 
                 Vec3 nextTPLocation;
                 Block TPBlockLocation;
@@ -68,39 +66,60 @@ public class AspectOfTheVoid extends Item implements PolymerItem {
                 boolean validSpecialTP;
 
                 // Check if the block the player is looking at is a valid TP location
-                do{
-                    // Player Crosshair to World Location (Player Looking Direction (* Y Direction Offset) * TP Distance + Player Position +- Offsets)
-                    double crosshairX = -Math.sin(Math.toRadians(user.getYRot())) * Math.cos(Math.toRadians(user.getXRot())) * finalTPDistance + user.getX() - HORIZONTAL_TP_OFFSET;
-                    double crosshairY = -Math.sin(Math.toRadians(user.getXRot())) * finalTPDistance + user.getY() + VERTICAL_TP_OFFSET;
-                    double crosshairZ = Math.cos(Math.toRadians(user.getYRot())) * Math.cos(Math.toRadians(user.getXRot())) * finalTPDistance + user.getZ() - HORIZONTAL_TP_OFFSET;
+                do {
+                    // Player Crosshair to World Location (Player Looking Direction (* Y Direction
+                    // Offset) * TP Distance + Player Position +- Offsets)
+                    double crosshairX = -Math.sin(Math.toRadians(user.getYRot()))
+                        * Math.cos(Math.toRadians(user.getXRot()))
+                        * finalTPDistance + user.getX()
+                        - HORIZONTAL_TP_OFFSET;
+                    double crosshairY = -Math.sin(Math.toRadians(user.getXRot())) * finalTPDistance + user.getY()
+                        + VERTICAL_TP_OFFSET;
+                    double crosshairZ = Math.cos(Math.toRadians(user.getYRot()))
+                        * Math.cos(Math.toRadians(user.getXRot()))
+                        * finalTPDistance + user.getZ()
+                        - HORIZONTAL_TP_OFFSET;
 
                     // Set the TP Block Location
                     int blockXPos = (int) Math.round(crosshairX);
                     int blockYPos = (int) Math.round(crosshairY);
                     int blockZPos = (int) Math.round(crosshairZ);
-                    TPBlockLocation = serverLevel.getBlockState(new BlockPos(blockXPos, blockYPos, blockZPos)).getBlock();
+                    TPBlockLocation = serverLevel.getBlockState(new BlockPos(blockXPos, blockYPos, blockZPos))
+                        .getBlock();
 
                     // Set the selected location to the next TP location
-                    nextTPLocation = new Vec3(blockXPos + HORIZONTAL_TP_OFFSET, blockYPos, blockZPos + HORIZONTAL_TP_OFFSET);
+                    nextTPLocation = new Vec3(blockXPos + HORIZONTAL_TP_OFFSET,
+                        blockYPos,
+                        blockZPos + HORIZONTAL_TP_OFFSET);
 
                     // Verify then set the next TP location
-                    validTP = TPBlockLocation == Blocks.AIR || TPBlockLocation == Blocks.CAVE_AIR || TPBlockLocation == Blocks.VOID_AIR || TPBlockLocation == Blocks.WATER;
-                    if(validTP){
+                    validTP = TPBlockLocation == Blocks.AIR || TPBlockLocation == Blocks.CAVE_AIR
+                        || TPBlockLocation == Blocks.VOID_AIR
+                        || TPBlockLocation == Blocks.WATER;
+                    if (validTP) {
                         finalTPLocation = nextTPLocation;
                         finalTPDistance++;
                     }
 
                     // Verify the special TP location
-                    Block blockAboveTP = serverLevel.getBlockState(new BlockPos(blockXPos, blockYPos + 1, blockZPos)).getBlock();
-                    validSpecialTP = !validTP && (blockAboveTP == Blocks.AIR || blockAboveTP == Blocks.CAVE_AIR || blockAboveTP == Blocks.VOID_AIR || blockAboveTP == Blocks.WATER);
+                    Block blockAboveTP = serverLevel.getBlockState(new BlockPos(blockXPos, blockYPos + 1, blockZPos))
+                        .getBlock();
+                    validSpecialTP = !validTP && (blockAboveTP == Blocks.AIR || blockAboveTP == Blocks.CAVE_AIR
+                        || blockAboveTP == Blocks.VOID_AIR
+                        || blockAboveTP == Blocks.WATER);
 
-                } while(validTP && finalTPDistance < MAX_TP_DISTANCE);
+                } while (validTP && finalTPDistance < MAX_TP_DISTANCE);
 
                 // Ability Checks
-                if((validSpecialTP || !TP_TO_BLOCK) && finalTPDistance > 0){
+                if ((validSpecialTP || !TP_TO_BLOCK) && finalTPDistance > 0) {
                     playerInventory.removeItem(new ItemStack(Items.ENDER_PEARL, COST));
 
-                    user.teleport(new TeleportTransition(playerDimension, finalTPLocation, finalTPMomentum, serverUser.getYRot(), serverUser.getXRot(), TeleportTransition.DO_NOTHING));
+                    user.teleport(new TeleportTransition(playerDimension,
+                        finalTPLocation,
+                        finalTPMomentum,
+                        serverUser.getYRot(),
+                        serverUser.getXRot(),
+                        TeleportTransition.DO_NOTHING));
                     user.resetFallDistance();
 
                     return InteractionResult.SUCCESS;
@@ -117,7 +136,8 @@ public class AspectOfTheVoid extends Item implements PolymerItem {
     }
 
     @Override
-    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
+    public @Nullable Identifier
+        getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
         return Identifier.parse("minecraft:diamond_spear");
     }
 

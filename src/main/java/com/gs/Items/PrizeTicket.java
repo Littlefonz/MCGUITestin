@@ -48,19 +48,23 @@ public class PrizeTicket extends Item implements PolymerItem {
     }
 
     @Override
-    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
+    public @Nullable Identifier
+        getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
         return Identifier.parse("minecraft:name_tag");
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context,
-		HolderLookup.Provider lookup) {
-		// Create the base client-sided item stack representation
+    public ItemStack getPolymerItemStack(ItemStack itemStack,
+        TooltipFlag tooltipType,
+        PacketContext context,
+        HolderLookup.Provider lookup) {
+        // Create the base client-sided item stack representation
         ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, lookup);
         out.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 
         return out;
     }
+
     @Override
     public void modifyClientTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {
         tooltip.addAll(GSUtils.infoComponents.apply("prize_ticket"));

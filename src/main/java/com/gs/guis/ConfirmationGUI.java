@@ -14,18 +14,23 @@ import eu.pb4.sgui.api.gui.SimpleGui;
 
 public class ConfirmationGUI<T> extends SimpleGui {
 
-
     GuiElementBuilder element;
     T item;
     Confirmable<T> conf;
 
-    public ConfirmationGUI(ServerPlayer player, ItemStack stack, Confirmable<T> g, T item){
+    public ConfirmationGUI(ServerPlayer player, ItemStack stack, Confirmable<T> g, T item) {
         this(player, new GuiElementBuilder(stack), g, item);
     }
-    public ConfirmationGUI(ServerPlayer player, GuiElementBuilder guiElement, Confirmable<T> g, T item){
+
+    public ConfirmationGUI(ServerPlayer player, GuiElementBuilder guiElement, Confirmable<T> g, T item) {
         this(player, guiElement, Component.literal("Exchange for this item?"), g, item);
     }
-    public ConfirmationGUI(ServerPlayer player, GuiElementBuilder guiElement, Component title, Confirmable<T> g, T item){
+
+    public ConfirmationGUI(ServerPlayer player,
+        GuiElementBuilder guiElement,
+        Component title,
+        Confirmable<T> g,
+        T item) {
         super(MenuType.GENERIC_9x3, player, false);
         this.setTitle(title);
 
@@ -44,9 +49,9 @@ public class ConfirmationGUI<T> extends SimpleGui {
 
     private void setupMainMenu() {
         // Background Setup
-        for (int s = 0; s < 27; s++){
+        for (int s = 0; s < 27; s++) {
             this.setSlot(s,
-                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
+                new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
         }
 
         this.setSlot(DENY, new GuiElementBuilder(Items.CONCRETE.red()).setName(Component.literal("Deny")));
@@ -56,11 +61,11 @@ public class ConfirmationGUI<T> extends SimpleGui {
 
     @Override
     public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
-        if(index == DENY){
+        if (index == DENY) {
             conf.confirm(false, item);
             close();
             return true;
-        } else if(index == CONFIRM){
+        } else if (index == CONFIRM) {
             conf.confirm(true, item);
             close();
             return true;

@@ -26,12 +26,12 @@ public class BuyAmountGUI extends SimpleGui {
 
     private static final int BACK_BUTTON_SLOT = 21;
     private static final int CLOSE_BUTTON_SLOT = 22;
-    private static final int CONFIRM_BUTTON_SLOT = (9*2)+5;
+    private static final int CONFIRM_BUTTON_SLOT = (9 * 2) + 5;
 
-    private static final int[] BORDER = { 0, 8, (9), (9)+8, (9*2), (9*2)+8 };
+    private static final int[] BORDER = { 0, 8, (9), (9) + 8, (9 * 2), (9 * 2) + 8 };
     private static final int[] BUY_SLOTS = { 11, 12, 13, 14, 15 };
 
-    public BuyAmountGUI(ServerPlayer player, ShopSettings settings, Trade r, GenericShopGUI g){
+    public BuyAmountGUI(ServerPlayer player, ShopSettings settings, Trade r, GenericShopGUI g) {
         super(MenuType.GENERIC_9x3, player, false);
         this.setTitle(Component.literal("Select Buy Amount"));
 
@@ -44,32 +44,36 @@ public class BuyAmountGUI extends SimpleGui {
     }
 
     private void updateSettings() {
-        //Confirmation Button
+        // Confirmation Button
         ArrayList<Component> lore = new ArrayList<>();
         lore.add(Component.literal(""));
         lore.add(Component.literal("§7Click to Toggle Confirmation, which will prevent"));
         lore.add(Component.literal("§7you from buying items until you confirm again!"));
 
-        if(settings.confirmation){
-            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)")).setLore(lore));
+        if (settings.confirmation) {
+            this.setSlot(CONFIRM_BUTTON_SLOT,
+                new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)"))
+                    .setLore(lore));
         } else {
-            this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
+            this.setSlot(CONFIRM_BUTTON_SLOT,
+                new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)"))
+                    .setLore(lore));
         }
     }
 
     private void setupMainMenu() {
-        //Background Setup
-        for (int s = 0; s < 27; s++){
+        // Background Setup
+        for (int s = 0; s < 27; s++) {
             this.setSlot(s,
-                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
+                new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).setName(Component.empty()).hideTooltip());
         }
 
         // Red Border
         for (int s : BORDER)
             this.setSlot(s,
-                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()).hideTooltip());
+                new GuiElementBuilder(Items.STAINED_GLASS_PANE.red()).setName(Component.empty()).hideTooltip());
 
-        //Buy Slots
+        // Buy Slots
         for (int i = 0; i < BUY_SLOTS.length; i++) {
             int multiplier = Math.powExact(2, i + 1);
             boolean affordable = multiplier <= affordableCnt;
@@ -88,10 +92,10 @@ public class BuyAmountGUI extends SimpleGui {
 
         }
 
-        //Back Button
+        // Back Button
         this.setSlot(BACK_BUTTON_SLOT, new GuiElementBuilder(Items.ARROW).setName(Component.literal("Back")));
 
-        //Close Button
+        // Close Button
         this.setSlot(CLOSE_BUTTON_SLOT, new GuiElementBuilder(Items.BARRIER).setName(Component.literal("Close")));
 
         updateSettings();
@@ -118,25 +122,29 @@ public class BuyAmountGUI extends SimpleGui {
         if (index == CLOSE_BUTTON_SLOT)
             save_and_close();
 
-        if (index == CONFIRM_BUTTON_SLOT){
+        if (index == CONFIRM_BUTTON_SLOT) {
             settings.confirmation = !settings.confirmation;
 
-            //Confirmation Button
+            // Confirmation Button
             ArrayList<Component> lore = new ArrayList<>();
             lore.add(Component.literal(""));
             lore.add(Component.literal("§7Click to Toggle Confirmation, which will prevent"));
             lore.add(Component.literal("§7you from buying items until you confirm again!"));
 
-            if(!settings.confirmation){
-                this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)")).setLore(lore));
+            if (!settings.confirmation) {
+                this.setSlot(CONFIRM_BUTTON_SLOT,
+                    new GuiElementBuilder(Items.DYE.lightGray()).setName(Component.literal("§cShop Confirmation (OFF)"))
+                        .setLore(lore));
             } else {
-                this.setSlot(CONFIRM_BUTTON_SLOT, new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)")).setLore(lore));
+                this.setSlot(CONFIRM_BUTTON_SLOT,
+                    new GuiElementBuilder(Items.DYE.lime()).setName(Component.literal("§aShop Confirmation (ON)"))
+                        .setLore(lore));
             }
 
             return false;
         }
 
-        for(int i = 0; i < BUY_SLOTS.length; i++){
+        for (int i = 0; i < BUY_SLOTS.length; i++) {
             int s = BUY_SLOTS[i];
 
             if (index == s) {
@@ -145,7 +153,8 @@ public class BuyAmountGUI extends SimpleGui {
                     break;
 
                 if (settings.confirmation) {
-                    new ConfirmationGUI<>(player, trade.guiElement(multiplier), this.g, trade.multiply(multiplier)).open();
+                    new ConfirmationGUI<>(player, trade.guiElement(multiplier), this.g, trade.multiply(multiplier))
+                        .open();
                     return false;
                 }
                 g.confirm(true, trade.multiply(multiplier));
