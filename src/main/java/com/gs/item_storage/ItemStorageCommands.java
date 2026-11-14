@@ -60,6 +60,16 @@ public class ItemStorageCommands {
 
         ItemStorage storage = ItemStorage.fromServer(ctx.getSource().getServer());
 
+        if (storage.getCollections().get(id) != null) {
+            ctx.getSource()
+                .sendSuccess(() -> Component.literal(String.format("§4[GSIS] collection \"%s\" already exists!", id)),
+                    false);
+            ctx.getSource()
+                .sendSuccess(() -> Component.literal(String.format("§4[GSIS] Delete it before trying to make one called \"%s\"", id)),
+                    false);
+            return 0;
+        }
+
         storage.newCollection(id);
 
         ctx.getSource()

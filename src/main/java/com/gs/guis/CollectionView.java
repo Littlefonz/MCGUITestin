@@ -81,6 +81,19 @@ public class CollectionView extends SimpleGui {
         for (WeightedStack s : stacks)
             max += s.w();
 
+        if (stacks.isEmpty()) {
+            for (int i = 0; i < PAGE_CAPACITY; i++) {
+                int x = i % PAGE_X;
+                int y = i / PAGE_X;
+                int slot = x + y * 9;
+
+                this.setSlot(slot,
+                    new GuiElementBuilder(Items.STAINED_GLASS_PANE.white())
+                        .setName(Component.literal("Drag and Drop items here to begin!")));
+            }
+            return;
+        }
+
         for (int i = 0; i < count; i++) {
             int idx = i + startIndex;
             int x = i % PAGE_X;
