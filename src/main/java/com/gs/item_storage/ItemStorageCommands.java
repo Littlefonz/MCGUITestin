@@ -60,12 +60,14 @@ public class ItemStorageCommands {
 
         ItemStorage storage = ItemStorage.fromServer(ctx.getSource().getServer());
 
-        if (storage.getCollections().get(id) != null) {
+        if (storage.contains(id)) {
             ctx.getSource()
                 .sendSuccess(() -> Component.literal(String.format("§4[GSIS] collection \"%s\" already exists!", id)),
                     false);
             ctx.getSource()
-                .sendSuccess(() -> Component.literal(String.format("§4[GSIS] Delete it before trying to make one called \"%s\"", id)),
+                .sendSuccess(
+                    () -> Component
+                        .literal(String.format("§4[GSIS] Delete it before trying to make one called \"%s\"", id)),
                     false);
             return 0;
         }
@@ -84,7 +86,7 @@ public class ItemStorageCommands {
             if (!b)
                 return;
 
-            storage.getCollections().remove(confirmedItem);
+            storage.drop(confirmedItem);
         }
     }
 
@@ -92,7 +94,7 @@ public class ItemStorageCommands {
         ItemStorage storage = ItemStorage.fromServer(ctx.getSource().getServer());
         String id = ctx.getArgument("collection_id", String.class);
 
-        if (!storage.getCollections().containsKey(id)) {
+        if (!storage.contains(id)) {
             ctx.getSource()
                 .sendSuccess(() -> Component.literal(String.format("§4[GSIS] collection id \"%s\" not found!", id)),
                     false);
@@ -113,7 +115,7 @@ public class ItemStorageCommands {
         ItemStorage storage = ItemStorage.fromServer(ctx.getSource().getServer());
         String id = ctx.getArgument("collection_id", String.class);
         ItemSamples collection;
-        if ((collection = storage.getCollections().get(id)) == null) {
+        if ((collection = storage.get(id)) == null) {
             ctx.getSource()
                 .sendSuccess(() -> Component.literal(String.format("§4[GSIS] collection id \"%s\" not found!", id)),
                     false);
@@ -163,7 +165,7 @@ public class ItemStorageCommands {
         String id = ctx.getArgument("collection_id", String.class);
 
         ItemSamples c;
-        if ((c = storage.getCollections().get(id)) == null) {
+        if ((c = storage.get(id)) == null) {
             ctx.getSource()
                 .sendSuccess(() -> Component.literal(String.format("§4[GSIS] collection id \"%s\" not found!", id)),
                     false);
@@ -198,7 +200,7 @@ public class ItemStorageCommands {
         String id = ctx.getArgument("collection_id", String.class);
 
         ItemSamples c;
-        if ((c = storage.getCollections().get(id)) == null) {
+        if ((c = storage.get(id)) == null) {
             ctx.getSource()
                 .sendSuccess(() -> Component.literal(String.format("§4[GSIS] collection id \"%s\" not found!", id)),
                     false);

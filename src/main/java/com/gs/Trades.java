@@ -1,8 +1,9 @@
 package com.gs;
 
-import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,12 +14,11 @@ import net.minecraft.world.item.ItemStack;
 
 public class Trades {
 
-    public Trades() {
-	}
+    private Trades() {
+    }
 
-
-	public record Offer(int count, Item item, DataComponentPatch patch, boolean patchIsExclusive) {
-    	public Offer(int count, Item item) {
+    public record Offer(int count, Item item, DataComponentPatch patch, boolean patchIsExclusive) {
+        public Offer(int count, Item item) {
             this(count, item, DataComponentPatch.EMPTY, true);
         }
 
@@ -31,12 +31,12 @@ public class Trades {
             if (patchIsExclusive) { // stack cannot have other components
                 return ItemStack.isSameItemSameComponents(o, stack);
             }
-            
-            // stack can have other components
-			ItemStack victim = stack.copy();
-			victim.applyComponents(patch);
 
-			return ItemStack.isSameItemSameComponents(stack, victim);
+            // stack can have other components
+            ItemStack victim = stack.copy();
+            victim.applyComponents(patch);
+
+            return ItemStack.isSameItemSameComponents(stack, victim);
         }
 
         public int countItems(Container c) {
@@ -46,7 +46,7 @@ public class Trades {
                     tot += s.count();
             return tot;
         }
-	}
+    }
 
     public record Reward(int count, Item item, DataComponentPatch patch) {
         public Reward(int count, Item item) {
@@ -59,7 +59,6 @@ public class Trades {
             return stack;
         }
 
-
     }
 
     public record Trade(Offer[] offers, Reward[] rewards) {
@@ -71,6 +70,7 @@ public class Trades {
             return new Trade(null, new Reward[] { reward });
 
         }
+
         public static Trade get(int count, Item item) {
             return new Trade(null, new Reward[] { new Reward(count, item) });
         }
@@ -86,7 +86,6 @@ public class Trades {
         public Trade from(int price, Item item) {
             return new Trade(new Offer[] { new Offer(price, item) }, rewards);
         }
-
 
         public Trade from(Offer[] offerings) {
             return new Trade(offerings, rewards);
@@ -115,75 +114,51 @@ public class Trades {
         public String getString() {
             StringBuilder offerstr = new StringBuilder();
             StringBuilder rewardstr = new StringBuilder();
-            if (offers != null) for (Offer offer : offers) {
-                offerstr.append(
-                    String.format(
-                        "%sx%d, ",
-                        offer.item
-                            .getDefaultInstance()
-                            .getHoverName()
-                            .getString(),
-                        offer.count
-                    )
-                );
-            }
-            if (rewards != null) for (Reward reward : rewards) {
-                rewardstr.append(
-                    String.format(
-                        "%sx%d, ",
-                        reward.item
-                            .getDefaultInstance()
-                            .getHoverName()
-                            .getString(),
-                        reward.count
-                    )
-                );
-            }
+            if (offers != null)
+                for (Offer offer : offers) {
+                    offerstr.append(String
+                        .format("%sx%d, ", offer.item.getDefaultInstance().getHoverName().getString(), offer.count));
+                }
+            if (rewards != null)
+                for (Reward reward : rewards) {
+                    rewardstr.append(String
+                        .format("%sx%d, ", reward.item.getDefaultInstance().getHoverName().getString(), reward.count));
+                }
 
-            return String.format(
-                "[%s] -> [%s]",
+            return String.format("[%s] -> [%s]",
                 offerstr.substring(0, Math.max(offerstr.length() - 2, 0)),
-                rewardstr.substring(0, Math.max(rewardstr.length() - 2, 0))
-            );
+                rewardstr.substring(0, Math.max(rewardstr.length() - 2, 0)));
         }
 
         public int getAffordableCount(ServerPlayer player) {
-            Inventory inv = player.getInventory();
-            int[] userCount = new int[offers.length];
-            for (int i = 0; i < userCount.length; i++) {
-                userCount[i] = inv.countItem(offers[i].item);
-            }
+            if (offers == null || offers.length == 0)
+                return Integer.MAX_VALUE;
 
-            int multiplier = 0;
-            boolean affordable = true;
-            while (affordable) {
-                for (int i = 0; i < offers.length; i++) {
-                    if (userCount[i] < offers[i].count * multiplier) {
-                        affordable = false;
-                        break;
-                    }
-                }
-                if (affordable) multiplier++;
+            Inventory inv = player.getInventory();
+            int affordable = Integer.MAX_VALUE;
+            for (Offer offer : offers) {
+                if (offer.count <= 0)
+                    continue;
+                affordable = Math.min(affordable, offer.countItems(inv) / offer.count);
             }
-            return multiplier;
+            return affordable;
         }
 
         public Trade multiply(int multiplier) {
-            Offer[] newOffers = new Offer[offers.length];
-            Reward[] newRewards = new Reward[rewards.length];
+            Offer[] newOffers = null;
+            Reward[] newRewards = null;
 
-            for (int i = 0; i < offers.length; i++) {
-                newOffers[i] = new Offer(
-                    offers[i].count * multiplier,
-                    offers[i].item
-                );
-            }
-            for (int i = 0; i < rewards.length; i++) {
-                newRewards[i] = new Reward(
-                    rewards[i].count * multiplier,
-                    rewards[i].item
-                );
-            }
+            if (offers != null)
+                newOffers = Arrays.stream(offers)
+                    .map(o -> new Offer(o.count * multiplier, o.item, o.patch, o.patchIsExclusive))
+                    .toList()
+                    .toArray(new Offer[0]);
+
+            if (rewards != null)
+                newRewards = Arrays.stream(rewards)
+                    .map(o -> new Reward(o.count * multiplier, o.item))
+                    .toList()
+                    .toArray(new Reward[0]);
 
             return new Trade(newOffers, newRewards);
         }
@@ -199,17 +174,8 @@ public class Trades {
             lore.add(Component.literal("Cost:"));
 
             for (Offer offer : offers)
-                lore.add(
-                    Component.literal(
-                        "§l" +
-                            offer.count * multiplier +
-                            "x §r" +
-                            offer.item
-                                .getDefaultInstance()
-                                .getHoverName()
-                                .getString()
-                    )
-                );
+                lore.add(Component.literal("§l" + offer.count * multiplier + "x §r"
+                    + offer.item.getDefaultInstance().getHoverName().getString()));
 
             return lore;
         }
@@ -217,16 +183,10 @@ public class Trades {
         public Component title(int multiplier) {
             StringBuilder title = new StringBuilder();
             for (Reward reward : rewards)
-                title
-                    .append("§l")
+                title.append("§l")
                     .append(reward.count * multiplier)
                     .append("x §r")
-                    .append(
-                        reward.item
-                            .getDefaultInstance()
-                            .getHoverName()
-                            .getString()
-                    )
+                    .append(reward.item.getDefaultInstance().getHoverName().getString())
                     .append(", ");
 
             return Component.literal(title.substring(0, title.length() - 2));
@@ -237,8 +197,7 @@ public class Trades {
         }
 
         public GuiElementBuilder guiElement(int multiplier) {
-            return new GuiElementBuilder(stack(0))
-                .setCount(rewards[0].count * Math.max(multiplier, 1))
+            return new GuiElementBuilder(stack(0)).setCount(rewards[0].count * Math.max(multiplier, 1))
                 .setName(title(multiplier))
                 .setLore(defaultLore(multiplier));
         }

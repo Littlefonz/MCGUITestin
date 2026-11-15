@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.jspecify.annotations.Nullable;
+
 import com.gs.GSServerMod;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -21,18 +23,25 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
 public class ItemStorage extends SavedData {
-    private HashMap<String, ItemSamples> collections;
+    private final HashMap<String, ItemSamples> collections;
 
-    public HashMap<String, ItemSamples> getCollections() {
-        return collections;
+    public Collection<ItemSamples> allSamples() {
+        return collections.values();
     }
 
-    public static Codec<ItemStorage> getCodec() {
-        return CODEC;
+    public @Nullable ItemSamples drop(String key) {
+        ItemSamples s = this.collections.remove(key);
+        if (s != null)
+            setDirty();
+        return s;
     }
 
-    public static SavedDataType<ItemStorage> getType() {
-        return TYPE;
+    public boolean contains(String key) {
+        return this.collections.containsKey(key);
+    }
+
+    public @Nullable ItemSamples get(String key) {
+        return this.collections.get(key);
     }
 
     public ItemStorage() {
@@ -82,13 +91,13 @@ public class ItemStorage extends SavedData {
         }
     }
 
-    private static final Codec<ItemStorage> CODEC = RecordCodecBuilder.create(instance -> instance
+    public static final Codec<ItemStorage> CODEC = RecordCodecBuilder.create(instance -> instance
         .group(ItemSamples.CODEC.listOf()
             .fieldOf("collections")
-            .forGetter(is -> new ArrayList<ItemSamples>(is.getCollections().values())))
+            .forGetter(is -> new ArrayList<ItemSamples>(is.allSamples())))
         .apply(instance, ItemStorage::new));
 
-    private static final SavedDataType<ItemStorage> TYPE = new SavedDataType<>(GSServerMod.id("item_storage"),
+    public static final SavedDataType<ItemStorage> TYPE = new SavedDataType<>(GSServerMod.id("item_storage"),
         ItemStorage::new,
         CODEC,
         null);

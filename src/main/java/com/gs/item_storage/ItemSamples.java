@@ -1,6 +1,7 @@
 package com.gs.item_storage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -59,7 +60,8 @@ public class ItemSamples {
             idx = ~idx; // Equivalent to -(index + 1)
         }
         arr.add(idx, ws);
-        this.sum += w;
+        if (this.sum != null)
+            this.sum += w;
     }
 
     public void pop(WeightedStack s) {
@@ -75,19 +77,17 @@ public class ItemSamples {
 
     public double weightSum() {
         if (this.sum != null)
-            return sum;
+            return this.sum;
 
-        double sum = 0;
-        for (WeightedStack s : arr)
-            sum += s.w();
-        this.sum = sum;
-        return sum;
+        this.sum = arr.stream().mapToDouble(s -> s.w()).sum();
+        return this.sum;
     }
 
     public void setItems(List<WeightedStack> q) {
         arr.clear();
         arr.addAll(q);
         arr.sort(WeightedStack::compare);
+        sum = null;
     }
 
     public Collection<WeightedStack> collection() {
