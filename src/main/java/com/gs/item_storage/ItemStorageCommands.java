@@ -1,11 +1,15 @@
 package com.gs.item_storage;
 
 import java.util.ArrayList;
+import java.util.UUID;
+
+import org.jspecify.annotations.Nullable;
 
 import com.gs.guis.CollectionView;
 import com.gs.guis.Confirmable;
 import com.gs.guis.ConfirmationGUI;
 import com.gs.item_storage.ItemSamples.WeightedStack;
+import com.gs.item_storage.ItemStorage.StorageEditor;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -17,6 +21,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.SlotArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -83,13 +88,18 @@ public class ItemStorageCommands {
         return 1;
     }
 
-    public static record DeleteConfirmation(ItemStorage storage) implements Confirmable<String> {
+    public static record DeleteConfirmation(MinecraftServer server, ServerPlayer player, ItemStorage storage) implements
+        Confirmable<String> {
         @Override
         public void confirm(boolean b, String confirmedItem) {
             if (!b)
                 return;
 
-            storage.drop(confirmedItem);
+            try (StorageEditor editor = editStorage(server, storage, player, confirmedItem)) {
+                if (editor == null)
+                    return;
+                editor.drop();
+            }
         }
     }
 
@@ -107,7 +117,7 @@ public class ItemStorageCommands {
         new ConfirmationGUI<>(ctx.getSource().getPlayer(),
             GuiElementBuilder.from(Items.PAPER.getDefaultInstance()).setName(Component.literal(id)),
             Component.literal(String.format("Are you sure you want to delete \"%s\"?", id)),
-            new DeleteConfirmation(storage),
+            new DeleteConfirmation(ctx.getSource().getServer(), ctx.getSource().getPlayer(), storage),
             id).open();
 
         return 1;
@@ -117,19 +127,24 @@ public class ItemStorageCommands {
         ServerPlayer player = ctx.getSource().getPlayer();
         ItemStorage storage = ItemStorage.fromServer(ctx.getSource().getServer());
         String id = ctx.getArgument("collection_id", String.class);
-        ItemSamples collection;
-        if ((collection = storage.get(id)) == null) {
+        if (!storage.contains(id)) {
             ctx.getSource()
                 .sendSuccess(() -> Component.literal(String.format("§4[GSIS] collection id \"%s\" not found!", id)),
                     false);
             return 0;
         }
 
-        CollectionView cv = new CollectionView(player, storage, collection);
-        cv.open();
+        StorageEditor editor = editStorage(ctx, id);
+        if (editor == null)
+            return 0;
+        try {
+            new CollectionView(player, editor).open();
+        } catch (RuntimeException e) {
+            editor.close();
+            throw e;
+        }
 
         return 1;
-
     }
 
     public static int saveInvFromSource(CommandContext<CommandSourceStack> ctx) {
@@ -186,7 +201,12 @@ public class ItemStorageCommands {
             return 1;
         }
 
-        storage.push(c.withAdded(new WeightedStack(1.0f, target.copy())));
+        try (StorageEditor editor = editStorage(ctx, id)) {
+            if (editor == null)
+                return 0;
+
+            editor.push(c.withAdded(new WeightedStack(1.0f, target.copy())));
+        }
 
         ctx.getSource()
             .sendSuccess(
@@ -230,12 +250,53 @@ public class ItemStorageCommands {
             count++;
         }
 
-        storage.push(c.withAdded(stacks));
+        try (StorageEditor editor = editStorage(ctx, id)) {
+            if (editor == null)
+                return 0;
+
+            editor.push(c.withAdded(stacks));
+        }
 
         String s = String.format("§2[GSIS] Saved %d items into collection \"%s\".", count, c.id());
 
         ctx.getSource().sendSuccess(() -> Component.literal(s), false);
 
         return 0;
+    }
+
+    private static @Nullable StorageEditor editStorage(CommandContext<CommandSourceStack> ctx, String id) {
+        MinecraftServer server = ctx.getSource().getServer();
+        ItemStorage storage = ItemStorage.fromServer(server);
+        StorageEditor editor = storage.tryEdit(id, ctx.getSource().getPlayer().nameAndId().id());
+
+        if (editor == null) {
+            UUID holder = storage.lockedBy(id);
+            ServerPlayer p = holder == null ? null : server.getPlayerList().getPlayer(holder);
+            String name = p != null ? p.getName().getString() : String.valueOf(holder);
+            ctx.getSource()
+                .sendSuccess(
+                    () -> Component
+                        .literal(String.format("§4[GSIS] collection id \"%s\" already being edited by %s!", id, name)),
+                    false);
+            return null;
+        }
+        return editor;
+    }
+
+    private static @Nullable StorageEditor editStorage(MinecraftServer server,
+        ItemStorage storage,
+        ServerPlayer player,
+        String id) {
+        StorageEditor editor = storage.tryEdit(id, player.nameAndId().id());
+
+        if (editor == null) {
+            UUID holder = storage.lockedBy(id);
+            ServerPlayer p = holder == null ? null : server.getPlayerList().getPlayer(holder);
+            String name = p != null ? p.getName().getString() : String.valueOf(holder);
+            player.sendSystemMessage(Component
+                .literal(String.format("§4[GSIS] collection id \"%s\" already being edited by %s!", id, name)));
+            return null;
+        }
+        return editor;
     }
 }

@@ -1,15 +1,5 @@
 package com.gs.guis;
 
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.inventory.ContainerInput;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.Consumable;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -17,12 +7,18 @@ import com.gs.GSServerMod;
 import com.gs.ItemTransactions;
 import com.gs.item_storage.ItemSamples;
 import com.gs.item_storage.ItemSamples.WeightedStack;
-import com.gs.item_storage.ItemStorage;
+import com.gs.item_storage.ItemStorage.StorageEditor;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class CollectionView extends SimpleGui {
 
@@ -31,8 +27,7 @@ public class CollectionView extends SimpleGui {
     private static final int PAGE_Y = 6;
     private static final int PAGE_CAPACITY = PAGE_X * PAGE_Y;
 
-    private final ItemStorage storage;
-    private ItemSamples samples;
+    private final StorageEditor editor;
     private final ArrayList<WeightedStack> stacks;
     private int page = 0;
     private int pageMax;
@@ -44,12 +39,11 @@ public class CollectionView extends SimpleGui {
     private static final int FWD_SLOT = 9 * 6 - 1;
     private static final DecimalFormat df = new DecimalFormat("0.###");
 
-    public CollectionView(final ServerPlayer player, final ItemStorage storage, final ItemSamples collection) {
+    public CollectionView(final ServerPlayer player, final StorageEditor editor) {
         super(MENU_TYPE, player, false);
 
-        this.storage = storage;
-        this.samples = collection;
-        this.stacks = new ArrayList<>(this.samples.collection());
+        this.editor = editor;
+        this.stacks = new ArrayList<>(editor.get().collection());
 
         this.pageMax = Math.max((int) Math.ceil(((double) stacks.size()) / PAGE_CAPACITY), 1);
         updateTitle();
@@ -69,7 +63,7 @@ public class CollectionView extends SimpleGui {
     }
 
     public void updateTitle() {
-        setTitle(Component.literal(String.format("Collection: %s (%d/%d)", samples.id(), page + 1, pageMax)));
+        setTitle(Component.literal(String.format("Collection: %s (%d/%d)", editor.getId(), page + 1, pageMax)));
     }
 
     public void setPageContents() {
@@ -209,8 +203,14 @@ public class CollectionView extends SimpleGui {
     }
 
     @Override
-    public void onPlayerClose(boolean success) {
-        save();
+    public void onRemoved() {
+        if (editor.isClosed())
+            return;
+        try {
+            save();
+        } finally {
+            editor.close();
+        }
     }
 
     public void save() {
@@ -222,16 +222,22 @@ public class CollectionView extends SimpleGui {
             }
         }
 
-        samples = samples.withStacks(stacks);
-        storage.push(samples);
+        ItemSamples samples = editor.get();
+        if (samples == null) { // Should not be possible...
+            samples = new ItemSamples(editor.getId(), stacks);
+        } else {
+            samples = samples.withStacks(stacks);
+        }
+
+        editor.push(samples);
 
         stacks.clear();
         stacks.addAll(samples.collection());
         setPageContents();
 
-        GSServerMod.LOGGER.info(String.format("Player %s saved collection \"%s\" with items \"%s\"",
+        GSServerMod.LOGGER.info(String.format("Player %s saved collection \"%s\" with items %s",
             player.nameAndId().name(),
-            samples.id(),
+            editor.getId(),
             stacks));
     }
 
