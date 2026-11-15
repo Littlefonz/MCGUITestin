@@ -20,7 +20,6 @@ import com.gs.item_storage.ItemSamples.WeightedStack;
 import com.gs.item_storage.ItemStorage;
 
 import eu.pb4.sgui.api.ClickType;
-import eu.pb4.sgui.api.elements.AnimatedGuiElementBuilder;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -33,7 +32,7 @@ public class CollectionView extends SimpleGui {
     private static final int PAGE_CAPACITY = PAGE_X * PAGE_Y;
 
     private final ItemStorage storage;
-    private final ItemSamples samples;
+    private ItemSamples samples;
     private final ArrayList<WeightedStack> stacks;
     private int page = 0;
     private int pageMax;
@@ -70,16 +69,14 @@ public class CollectionView extends SimpleGui {
     }
 
     public void updateTitle() {
-        setTitle(Component.literal(String.format("Collection: %s (%d/%d)", samples.collection_id, page + 1, pageMax)));
+        setTitle(Component.literal(String.format("Collection: %s (%d/%d)", samples.id(), page + 1, pageMax)));
     }
 
     public void setPageContents() {
         int startIndex = page * PAGE_CAPACITY;
         int count = Math.clamp(stacks.size() - startIndex, 0, PAGE_CAPACITY);
 
-        float max = 0;
-        for (WeightedStack s : stacks)
-            max += s.w();
+        double max = ItemSamples.weightSum(stacks);
 
         if (stacks.isEmpty()) {
             for (int i = 0; i < PAGE_CAPACITY; i++) {
@@ -100,7 +97,7 @@ public class CollectionView extends SimpleGui {
             int y = i / PAGE_X;
 
             WeightedStack ws = stacks.get(idx);
-            float ratio = (ws.w() / max);
+            double ratio = (ws.w() / max);
             this.setSlot(x + y * 9,
                 new GuiElementBuilder(ws.s())
                     .addLoreLine(Component.literal(
@@ -225,15 +222,16 @@ public class CollectionView extends SimpleGui {
             }
         }
 
-        samples.setItems(stacks);
-        storage.setDirty();
+        samples = samples.withStacks(stacks);
+        storage.push(samples);
+
         stacks.clear();
         stacks.addAll(samples.collection());
         setPageContents();
 
         GSServerMod.LOGGER.info(String.format("Player %s saved collection \"%s\" with items \"%s\"",
             player.nameAndId().name(),
-            samples.collection_id,
+            samples.id(),
             stacks));
     }
 

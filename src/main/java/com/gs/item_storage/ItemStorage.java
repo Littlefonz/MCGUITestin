@@ -1,6 +1,5 @@
 package com.gs.item_storage;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +51,7 @@ public class ItemStorage extends SavedData {
 
         HashMap<String, ItemSamples> h = new HashMap<>();
         for (ItemSamples c : collections)
-            h.put(c.collection_id, c);
+            h.put(c.id(), c);
 
         this.collections = h;
     }
@@ -65,15 +64,19 @@ public class ItemStorage extends SavedData {
         return server.getDataStorage().computeIfAbsent(TYPE);
     }
 
-    public ItemSamples newCollection(String id) {
-        ItemSamples ic = new ItemSamples(id);
-
-        if (!collections.containsKey(id)) {
-            collections.put(id, ic);
-            setDirty();
+    public ItemSamples putIfAbsent(String id) {
+        if (collections.containsKey(id)) {
+            return collections.get(id);
         }
-
+        ItemSamples ic = new ItemSamples(id);
+        collections.put(id, ic);
+        setDirty();
         return ic;
+    }
+
+    public void push(ItemSamples samples) {
+        collections.put(samples.id(), samples);
+        setDirty();
     }
 
     public static class IdSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
@@ -92,9 +95,7 @@ public class ItemStorage extends SavedData {
     }
 
     public static final Codec<ItemStorage> CODEC = RecordCodecBuilder.create(instance -> instance
-        .group(ItemSamples.CODEC.listOf()
-            .fieldOf("collections")
-            .forGetter(is -> new ArrayList<ItemSamples>(is.allSamples())))
+        .group(ItemSamples.CODEC.listOf().fieldOf("collections").forGetter(is -> List.copyOf(is.allSamples())))
         .apply(instance, ItemStorage::new));
 
     public static final SavedDataType<ItemStorage> TYPE = new SavedDataType<>(GSServerMod.id("item_storage"),

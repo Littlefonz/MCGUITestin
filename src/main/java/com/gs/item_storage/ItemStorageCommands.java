@@ -1,8 +1,11 @@
 package com.gs.item_storage;
 
+import java.util.ArrayList;
+
 import com.gs.guis.CollectionView;
 import com.gs.guis.Confirmable;
 import com.gs.guis.ConfirmationGUI;
+import com.gs.item_storage.ItemSamples.WeightedStack;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -72,7 +75,7 @@ public class ItemStorageCommands {
             return 0;
         }
 
-        storage.newCollection(id);
+        storage.putIfAbsent(id);
 
         ctx.getSource()
             .sendSuccess(() -> Component.literal(String.format("§2[GSIS] Collection \"%s\" created.", id)), false);
@@ -183,13 +186,12 @@ public class ItemStorageCommands {
             return 1;
         }
 
-        c.push(1.0f, target);
-        storage.setDirty();
+        storage.push(c.withAdded(new WeightedStack(1.0f, target.copy())));
 
         ctx.getSource()
             .sendSuccess(
-                () -> Component.literal(
-                    String.format("§2[GSIS] Target \"%s\" saved in collection \"%s\".", target, c.collection_id)),
+                () -> Component
+                    .literal(String.format("§2[GSIS] Target \"%s\" saved in collection \"%s\".", target, c.id())),
                 false);
 
         return 0;
@@ -218,19 +220,19 @@ public class ItemStorageCommands {
             return 1;
         }
 
-        // c.stacks.ensureCapacity(c.stacks.size() + target.getContainerSize());
+        ArrayList<WeightedStack> stacks = new ArrayList<>();
         int count = 0;
-        for (ItemStack slot : target) {
-            if (slot.isEmpty())
+        for (ItemStack stack : target) {
+            if (stack.isEmpty())
                 continue;
 
-            c.push(1.0f, slot);
+            stacks.add(new WeightedStack(1.0f, stack.copy()));
             count++;
         }
 
-        storage.setDirty();
+        storage.push(c.withAdded(stacks));
 
-        String s = String.format("§2[GSIS] Saved %d items into collection \"%s\".", count, c.collection_id);
+        String s = String.format("§2[GSIS] Saved %d items into collection \"%s\".", count, c.id());
 
         ctx.getSource().sendSuccess(() -> Component.literal(s), false);
 
