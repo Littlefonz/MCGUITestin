@@ -18,6 +18,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.permission.v1.PermissionPredicates;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -25,6 +26,8 @@ import net.minecraft.commands.arguments.SlotArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.PermissionCheckTypes;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -34,6 +37,7 @@ public class ItemStorageCommands {
     public static void initialize() {
         CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
             dispatcher.register(Commands.literal("gsis")
+                .requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 // Create a new item collection
                 .then(Commands.literal("create")
                     .then(Commands.argument("collection_id", StringArgumentType.word())
