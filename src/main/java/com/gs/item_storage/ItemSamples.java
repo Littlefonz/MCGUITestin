@@ -17,12 +17,12 @@ public record ItemSamples(String id, List<WeightedStack> stacks) {
         stacks = List.copyOf(sorted);
     }
 
-    public static record WeightedStack(Float w, ItemStack s) {
+    public static record WeightedStack(Double w, ItemStack s) {
         public static int compare(WeightedStack x, WeightedStack y) {
-            return Float.compare(y.w, x.w);
+            return Double.compare(y.w, x.w);
         }
 
-        public WeightedStack withWeight(float w) {
+        public WeightedStack withWeight(double w) {
             return new WeightedStack(w, s);
         }
 
@@ -31,7 +31,7 @@ public record ItemSamples(String id, List<WeightedStack> stacks) {
         }
 
         public static final Codec<WeightedStack> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(Codec.FLOAT.fieldOf("f").forGetter(ws -> ws.w), ItemStack.CODEC.fieldOf("s").forGetter(ws -> ws.s))
+            .group(Codec.DOUBLE.fieldOf("f").forGetter(ws -> ws.w), ItemStack.CODEC.fieldOf("s").forGetter(ws -> ws.s))
             .apply(instance, WeightedStack::new));
     }
 

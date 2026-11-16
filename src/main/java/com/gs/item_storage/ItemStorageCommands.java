@@ -5,11 +5,13 @@ import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
 
+import com.gs.ItemTransactions;
 import com.gs.guis.CollectionView;
 import com.gs.guis.Confirmable;
 import com.gs.guis.ConfirmationGUI;
 import com.gs.item_storage.ItemSamples.WeightedStack;
 import com.gs.item_storage.ItemStorage.StorageEditor;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -47,7 +49,15 @@ public class ItemStorageCommands {
                         .suggests(new ItemStorage.IdSuggestionProvider())
                         .executes(ItemStorageCommands::openCollection)))
                 // TODO List out all collections
-                // TODO Sample from a given section
+                // Sample from a given section
+                .then(Commands.literal("sample")
+                    .then(Commands.argument("collection_id", StringArgumentType.word())
+                        .suggests(new ItemStorage.IdSuggestionProvider())
+                        .executes(ItemStorageCommands::sampleCollection)
+                        .then(Commands.argument("target", EntityArgument.player())
+                            .executes(ItemStorageCommands::sampleCollection)
+                            .then(Commands.argument("count", IntegerArgumentType.integer(1))
+                                .executes(ItemStorageCommands::sampleCollection)))))
                 // TODO ???
                 // Save item in held hand
                 .then(Commands.literal("save")
@@ -205,7 +215,7 @@ public class ItemStorageCommands {
             if (editor == null)
                 return 0;
 
-            editor.push(c.withAdded(new WeightedStack(1.0f, target.copy())));
+            editor.push(c.withAdded(new WeightedStack(1.0, target.copy())));
         }
 
         ctx.getSource()
@@ -246,7 +256,7 @@ public class ItemStorageCommands {
             if (stack.isEmpty())
                 continue;
 
-            stacks.add(new WeightedStack(1.0f, stack.copy()));
+            stacks.add(new WeightedStack(1.0, stack.copy()));
             count++;
         }
 
@@ -260,6 +270,50 @@ public class ItemStorageCommands {
         String s = String.format("§2[GSIS] Saved %d items into collection \"%s\".", count, c.id());
 
         ctx.getSource().sendSuccess(() -> Component.literal(s), false);
+
+        return 0;
+    }
+
+    public static int sampleCollection(CommandContext<CommandSourceStack> ctx) {
+        ItemStorage storage = ItemStorage.fromServer(ctx.getSource().getServer());
+        String id = ctx.getArgument("collection_id", String.class);
+        ServerPlayer target = null;
+        int count = 1;
+
+        try {
+            target = EntityArgument.getPlayer(ctx, "target");
+        } catch (Exception _) {
+            if ((target = ctx.getSource().getPlayer()) == null) {
+                ctx.getSource()
+                    .sendSuccess(() -> Component.literal("§4Sample without a target is only available as a player!"),
+                        false);
+                return 1;
+            } else {
+                // No target was specified -- assume player
+            }
+        }
+
+        try {
+            count = IntegerArgumentType.getInteger(ctx, "count");
+        } catch (Exception _) {
+            // No count was specified -- assume 1
+        }
+
+        Sampler sampler = storage.sample(id);
+
+        if (sampler == null) {
+            ctx.getSource()
+                .sendSuccess(
+                    () -> Component
+                        .literal(String.format("§4Unable to sample %s! does collection \"%s\" exist?", id, id)),
+                    false);
+            return 1;
+        }
+
+        while (count > 0) {
+            ItemTransactions.giveToPlayer(target, target.getInventory(), sampler.next());
+            count--;
+        }
 
         return 0;
     }

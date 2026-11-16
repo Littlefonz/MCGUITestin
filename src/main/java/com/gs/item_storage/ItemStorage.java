@@ -23,22 +23,20 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
 public class ItemStorage extends SavedData {
-    private final HashMap<String, ItemSamples> collections;
+    private final HashMap<String, ItemSamples> collections = new HashMap<>();
+    private final HashMap<String, Sampler> samplers = new HashMap<>();
 
     public ItemStorage() {
-        collections = new HashMap<>();
     }
 
-    public ItemStorage(List<ItemSamples> collections) {
-        HashMap<String, ItemSamples> h = new HashMap<>();
-        for (ItemSamples c : collections)
-            h.put(c.id(), c);
+    public ItemStorage(List<ItemSamples> sampleList) {
+        for (ItemSamples c : sampleList)
+            this.collections.put(c.id(), c);
 
-        this.collections = h;
     }
 
     public ItemStorage(HashMap<String, ItemSamples> collections) {
-        this.collections = collections;
+        this.collections.putAll(collections);
     }
 
     public static ItemStorage fromServer(MinecraftServer server) {
@@ -49,12 +47,12 @@ public class ItemStorage extends SavedData {
         return collections.values();
     }
 
-    public boolean contains(String key) {
-        return this.collections.containsKey(key);
+    public boolean contains(String id) {
+        return this.collections.containsKey(id);
     }
 
-    public @Nullable ItemSamples get(String key) {
-        return this.collections.get(key);
+    public @Nullable ItemSamples get(String id) {
+        return this.collections.get(id);
     }
 
     public ItemSamples putIfAbsent(String id) {
@@ -67,16 +65,28 @@ public class ItemStorage extends SavedData {
         return ic;
     }
 
-    private @Nullable ItemSamples drop(String key) {
-        ItemSamples s = this.collections.remove(key);
-        if (s != null)
+    private @Nullable ItemSamples drop(String id) {
+        ItemSamples s = this.collections.remove(id);
+        if (s != null) {
+            samplers.remove(id);
             setDirty();
+
+        }
         return s;
     }
 
     private void push(ItemSamples samples) {
         collections.put(samples.id(), samples);
+        samplers.remove(samples.id());
         setDirty();
+    }
+
+    /// Sampler stuff
+
+    public @Nullable Sampler sample(String id) {
+        if (!samplers.containsKey(id) && collections.containsKey(id))
+            samplers.put(id, new Sampler(collections.get(id)));
+        return samplers.get(id);
     }
 
     /// Editor lock stuff
@@ -105,7 +115,8 @@ public class ItemStorage extends SavedData {
         }
 
         public void drop() {
-            if (closed) return;
+            if (closed)
+                return;
             ItemStorage.this.drop(id);
             close();
         }
@@ -124,7 +135,8 @@ public class ItemStorage extends SavedData {
 
         @Override
         public void close() {
-            if (closed) return;
+            if (closed)
+                return;
             editors.remove(id, this);
             closed = true;
         }

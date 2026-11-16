@@ -166,7 +166,7 @@ public class CollectionView extends SimpleGui {
         if (!inBounds) {
             ItemStack c = player.containerMenu.getCarried();
             if (!c.isEmpty()) {
-                stacks.add(new WeightedStack(1.0f, c.copy()));
+                stacks.add(new WeightedStack(1.0, c.copy()));
             }
             setPageContents();
             updateTitle();
@@ -180,7 +180,6 @@ public class CollectionView extends SimpleGui {
             player.containerMenu.setCarried(stack.s());
 
         // Add to selected item weight
-        System.out.println("" + index + " " + type + " " + action);
         float factor = switch (type) {
             case ClickType.MOUSE_LEFT_SHIFT -> 10f;
             case ClickType.MOUSE_LEFT -> 1f;
@@ -190,8 +189,8 @@ public class CollectionView extends SimpleGui {
         };
         factor *= multiplier;
 
-        float newWeight = Math.max(stack.w() + factor, 0.0f);
-        if (!Float.isFinite(newWeight)) {
+        double newWeight = Math.max(stack.w() + factor, 0.0);
+        if (!Double.isFinite(newWeight)) {
             newWeight = 0.0f;
         }
 
@@ -216,7 +215,7 @@ public class CollectionView extends SimpleGui {
     public void save() {
         for (int i = stacks.size() - 1; i >= 0; i--) {
             WeightedStack s = stacks.get(i);
-            if (s.w().equals(0.0f)) {
+            if (s.w().equals(0.0)) {
                 ItemTransactions.giveToPlayer(player, player.getInventory(), s.s());
                 stacks.remove(i);
             }
